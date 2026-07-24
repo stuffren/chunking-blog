@@ -1,0 +1,19 @@
+{
+  "name": "chunking-blog",
+  "version": "1.0.0",
+  "description": "A blog powered by GitHub Discussions",
+  "type": "module",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build && node --env-file=.env build-ssg.js",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "@octokit/core": "^6.0.0",
+    "highlight.js": "^11.9.0",
+    "marked": "^12.0.0"
+  },
+  "devDependencies": {
+    "vite": "^5.0.0"
+  }
+}

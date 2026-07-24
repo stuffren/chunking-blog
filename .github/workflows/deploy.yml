@@ -1,0 +1,50 @@
+name: Build and Deploy
+
+on:
+  # 代码推送到 main 分支时触发
+  push:
+    branches: [main]
+  
+  # 每 6 小时定时触发，同步新发布的 Discussion
+  schedule:
+    - cron: '0 */6 * * *'
+  
+  # 支持手动触发
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      # 1. 检出代码
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      # 2. 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+      
+      # 3. 安装依赖
+      - name: Install dependencies
+        run: npm ci
+      
+      # 4. 执行构建（自动触发 SSG）
+      - name: Build
+        run: npm run build
+        env:
+          VITE_GITHUB_OWNER: ${{ secrets.GH_OWNER }}
+          VITE_GITHUB_REPO: ${{ secrets.GH_REPO }}
+          VITE_GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          VITE_GISCUS_REPO_ID: ${{ secrets.GISCUS_REPO_ID }}
+          VITE_GISCUS_CATEGORY_ID: ${{ secrets.GISCUS_CATEGORY_ID }}
+      
+      # 5. 部署到 GitHub Pages
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
