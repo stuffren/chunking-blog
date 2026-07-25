@@ -13,18 +13,19 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
   <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
-  <link rel="stylesheet" crossorigin href="/assets/main-Dix6Oozi.css">
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
 </head>
 <body>
   <div id="app">
     <header class="site-header">
       <div class="container">
         <nav class="main-nav">
-          <a href="/" class="logo">chunking</a>
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
           <div class="nav-links">
-            <a href="/categories">Categories</a>
-            <a href="/tags">Tags</a>
-            <a href="/about">About</a>
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
           </div>
         </nav>
       </div>
@@ -33,9 +34,10 @@
       
     <div class="page-category-detail container">
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
         <span class="sep">/</span>
-        <a href="/categories">Categories</a>
+        <a href="/chunking-blog/categories">Categories</a>
         <span class="sep">/</span>
         <span>Blog</span>
       </nav>
@@ -47,57 +49,68 @@
       <div class="post-list">
         
           <article class="post-card">
-            <h2><a href="/posts/1">优化后的需求文档v1.3</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/1">优化后的需求文档v1.3</a></h2>
             <time datetime="2026-07-22T10:06:47Z">2026年7月22日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/3">Create a SPA Router with Vanilla JavaScript</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/3">Create a SPA Router with Vanilla JavaScript</a></h2>
             <time datetime="2026-07-22T11:56:03Z">2026年7月22日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/6">生产构建相关问题的修复记录汇总</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/6">生产构建相关问题的修复记录汇总</a></h2>
             <time datetime="2026-07-23T22:34:41Z">2026年7月23日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/7">文章详情页 Giscus 报错问题修复记录</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/7">文章详情页 Giscus 报错问题修复记录</a></h2>
             <time datetime="2026-07-24T11:06:31Z">2026年7月24日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/8">分类页显示空白问题修复记录</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/8">分类页显示空白问题修复记录</a></h2>
             <time datetime="2026-07-24T11:34:07Z">2026年7月24日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/9">vscode skill</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/9">vscode skill</a></h2>
             <time datetime="2026-07-24T12:19:14Z">2026年7月24日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/10">开发提示词</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/10">开发提示词</a></h2>
             <time datetime="2026-07-24T13:01:13Z">2026年7月24日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/11">首页文章列表中部分文章没有显示出来的修复记录</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/11">首页文章列表中部分文章没有显示出来的修复记录</a></h2>
             <time datetime="2026-07-24T13:50:42Z">2026年7月24日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/12">首页文章列表的文章超量显示的修复记录</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/12">首页文章列表的文章超量显示的修复记录</a></h2>
             <time datetime="2026-07-24T13:56:24Z">2026年7月24日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/13">分页第二页没有分页按钮的修复记录</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/13">分页第二页没有分页按钮的修复记录</a></h2>
             <time datetime="2026-07-24T14:02:15Z">2026年7月24日</time>
           </article>
         
           <article class="post-card">
-            <h2><a href="/posts/14">Bug3及其衍生问题的完整修复记录</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="/chunking-blog/posts/14">Bug3及其衍生问题的完整修复记录</a></h2>
             <time datetime="2026-07-24T19:55:43Z">2026年7月24日</time>
           </article>
         
@@ -112,6 +125,6 @@
     </footer>
   </div>
   <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
-  <script type="module" crossorigin src="/assets/main-BfFzIf8d.js"></script>
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
 </body>
 </html>

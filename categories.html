@@ -13,18 +13,19 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
   <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
-  <link rel="stylesheet" crossorigin href="/assets/main-Dix6Oozi.css">
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
 </head>
 <body>
   <div id="app">
     <header class="site-header">
       <div class="container">
         <nav class="main-nav">
-          <a href="/" class="logo">chunking</a>
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
           <div class="nav-links">
-            <a href="/categories">Categories</a>
-            <a href="/tags">Tags</a>
-            <a href="/about">About</a>
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
           </div>
         </nav>
       </div>
@@ -33,26 +34,30 @@
       
     <div class="page-categories container">
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
         <span class="sep">/</span>
         <span>Categories</span>
       </nav>
       <h1>Categories</h1>
       <div class="category-grid">
         
-            <a href="/categories/blog" class="category-card">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/categories/blog" class="category-card">
               <h2>Blog</h2>
               <p class="category-desc">普通博客文章</p>
               <span class="count">11 articles</span>
             </a>
           
-            <a href="/categories/about" class="category-card">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/categories/about" class="category-card">
               <h2>About</h2>
               <p class="category-desc">about页面内容</p>
               <span class="count">0 articles</span>
             </a>
           
-            <a href="/categories/comments" class="category-card">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/categories/comments" class="category-card">
               <h2>Comments</h2>
               <p class="category-desc">Giscus 评论专用</p>
               <span class="count">2 articles</span>
@@ -69,6 +74,6 @@
     </footer>
   </div>
   <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
-  <script type="module" crossorigin src="/assets/main-BfFzIf8d.js"></script>
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
 </body>
 </html>

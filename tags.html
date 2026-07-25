@@ -13,18 +13,19 @@
   <meta name="twitter:card" content="summary_large_image">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
   <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
-  <link rel="stylesheet" crossorigin href="/assets/main-Dix6Oozi.css">
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
 </head>
 <body>
   <div id="app">
     <header class="site-header">
       <div class="container">
         <nav class="main-nav">
-          <a href="/" class="logo">chunking</a>
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
           <div class="nav-links">
-            <a href="/categories">Categories</a>
-            <a href="/tags">Tags</a>
-            <a href="/about">About</a>
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
           </div>
         </nav>
       </div>
@@ -33,69 +34,82 @@
       
     <div class="page-tags container">
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
         <span class="sep">/</span>
         <span>Tags</span>
       </nav>
       <h1>Tags</h1>
       <div class="tag-cloud">
         
-            <a href="/tags/bug" class="tag-item" style="font-size: 2.00rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/bug" class="tag-item" style="font-size: 2.00rem">
               bug
               <span class="count">6</span>
             </a>
           
-            <a href="/tags/documentation" class="tag-item" style="font-size: 1.20rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/documentation" class="tag-item" style="font-size: 1.20rem">
               documentation
               <span class="count">2</span>
             </a>
           
-            <a href="/tags/duplicate" class="tag-item" style="font-size: 0.80rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/duplicate" class="tag-item" style="font-size: 0.80rem">
               duplicate
               <span class="count">0</span>
             </a>
           
-            <a href="/tags/enhancement" class="tag-item" style="font-size: 0.80rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/enhancement" class="tag-item" style="font-size: 0.80rem">
               enhancement
               <span class="count">0</span>
             </a>
           
-            <a href="/tags/good-first-issue" class="tag-item" style="font-size: 0.80rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/good-first-issue" class="tag-item" style="font-size: 0.80rem">
               good first issue
               <span class="count">0</span>
             </a>
           
-            <a href="/tags/help-wanted" class="tag-item" style="font-size: 0.80rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/help-wanted" class="tag-item" style="font-size: 0.80rem">
               help wanted
               <span class="count">0</span>
             </a>
           
-            <a href="/tags/invalid" class="tag-item" style="font-size: 0.80rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/invalid" class="tag-item" style="font-size: 0.80rem">
               invalid
               <span class="count">0</span>
             </a>
           
-            <a href="/tags/javascript" class="tag-item" style="font-size: 1.00rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/javascript" class="tag-item" style="font-size: 1.00rem">
               javascript
               <span class="count">1</span>
             </a>
           
-            <a href="/tags/npm_run_build" class="tag-item" style="font-size: 1.00rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/npm_run_build" class="tag-item" style="font-size: 1.00rem">
               npm_run_build
               <span class="count">1</span>
             </a>
           
-            <a href="/tags/question" class="tag-item" style="font-size: 0.80rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/question" class="tag-item" style="font-size: 0.80rem">
               question
               <span class="count">0</span>
             </a>
           
-            <a href="/tags/tips" class="tag-item" style="font-size: 1.00rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/tips" class="tag-item" style="font-size: 1.00rem">
               tips
               <span class="count">1</span>
             </a>
           
-            <a href="/tags/wontfix" class="tag-item" style="font-size: 0.80rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="/chunking-blog/tags/wontfix" class="tag-item" style="font-size: 0.80rem">
               wontfix
               <span class="count">0</span>
             </a>
@@ -111,6 +125,6 @@
     </footer>
   </div>
   <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
-  <script type="module" crossorigin src="/assets/main-BfFzIf8d.js"></script>
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
 </body>
 </html>
