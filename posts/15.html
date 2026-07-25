@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>github action构建失败修复记录 | Chunking</title>
+  <meta name="description" content="修复记录 7  序号： 7  问题概括： 将远程仓库地址从 HTTPS 改为 SSH 时，执行 git remote add origin 提示 error: remote origin already exists.  问题类别： Git 配置  影响范围： 本地 Git 仓库与 GitHub 远程仓...">
+  <meta property="og:title" content="github action构建失败修复记录">
+  <meta property="og:description" content="修复记录 7  序号： 7  问题概括： 将远程仓库地址从 HTTPS 改为 SSH 时，执行 git remote add origin 提示 error: remote origin already exists.  问题类别： Git 配置  影响范围： 本地 Git 仓库与 GitHub 远程仓...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/15">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>github action构建失败修复记录</span>
+      </nav>
+      <header class="post-header">
+        <h1>github action构建失败修复记录</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-25T14:25:10Z">2026年7月25日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/github_action" class="tag">github_action</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <h3>修复记录 #7</h3>
+<p><strong>序号：</strong> 7</p>
+<p><strong>问题概括：</strong> 将远程仓库地址从 HTTPS 改为 SSH 时，执行 <code>git remote add origin</code> 提示 <code>error: remote origin already exists.</code></p>
+<p><strong>问题类别：</strong> Git 配置</p>
+<p><strong>影响范围：</strong> 本地 Git 仓库与 GitHub 远程仓库的关联</p>
+<p><strong>问题原因：</strong></p>
+<ul>
+<li><strong>技术根因：</strong> 本地仓库初始化后，已通过 HTTPS 协议添加了名为 <code>origin</code> 的远程仓库（<code>https://github.com/stuffren/chunking-blog.git</code>）。Git 不允许两个同名远程仓库同时存在，因此再次执行 <code>git remote add</code> 时因名称冲突而报错。</li>
+<li><strong>大白话解释：</strong> 你想给快递柜登记个新地址，但系统说&quot;这个柜子已经有地址了&quot;。不能直接新增，只能修改已有的登记信息。</li>
+</ul>
+<p><strong>排查思路：</strong></p>
+<ol>
+<li>执行 <code>git remote add origin git@github.com:stuffren/chunking-blog.git</code> 报错 <code>already exists</code>；</li>
+<li>执行 <code>git remote -v</code> 查看当前 remote，发现已存在 HTTPS 地址；</li>
+<li>推断需要使用 <code>git remote set-url</code> 替换已有 remote 的 URL，而非重新 <code>add</code>；</li>
+<li>执行 <code>git remote set-url origin git@github.com:stuffren/chunking-blog.git</code> 后验证通过。</li>
+</ol>
+<p><strong>最佳解决方法：</strong> 执行 <code>git remote set-url origin git@github.com:stuffren/chunking-blog.git</code> 替换已有 origin 的地址，而非 <code>git remote add</code>。</p>
+<p><strong>验证状态：</strong> ✅ 用户已确认（&quot;SSH地址改好了&quot;）</p>
+<hr>
+<h3>修复记录 #8</h3>
+<p><strong>序号：</strong> 8</p>
+<p><strong>问题概括：</strong> 首次推送本地代码到 GitHub <code>main</code> 分支时被拒绝，提示 <code>! [rejected] main -&gt; main (fetch first)</code>。</p>
+<p><strong>问题类别：</strong> Git 同步</p>
+<p><strong>影响范围：</strong> 代码首次推送到远程仓库</p>
+<p><strong>问题原因：</strong></p>
+<ul>
+<li><strong>技术根因：</strong> 创建 GitHub 仓库时勾选了&quot;Add a README file&quot;，导致远程仓库存在一个初始提交（包含 README.md）。本地仓库是从零开始的全新提交历史，与远程历史不相关，Git 默认拒绝这种非快进且历史不相关的推送。</li>
+<li><strong>大白话解释：</strong> 远程仓库比你早&quot;出生&quot;一天，还带着个 README 胎记。你直接往上冲，Git 保安说&quot;等等，你身上没这个胎记，不能插队&quot;。</li>
+</ul>
+<p><strong>排查思路：</strong></p>
+<ol>
+<li><code>git push -u origin main</code> 报错 rejected，提示 <code>the remote contains work that you do not have locally</code>；</li>
+<li>回忆创建仓库时勾选了 <code>Add a README file</code>；</li>
+<li>推断需要先将远程的初始提交合并到本地，使两边历史产生关联；</li>
+<li>执行 <code>git pull origin main --allow-unrelated-histories --no-rebase</code> 合并不相关历史；</li>
+<li>合并成功后再次执行 <code>git push -u origin main</code>，推送成功。</li>
+</ol>
+<p><strong>最佳解决方法：</strong> 先执行 <code>git pull origin main --allow-unrelated-histories --no-rebase</code> 合并远程初始提交，再执行 <code>git push -u origin main</code>。</p>
+<p><strong>验证状态：</strong> ✅ 用户已确认（&quot;已经成功解决问题了&quot;）</p>
+<hr>
+<h3>修复记录 #9</h3>
+<p><strong>序号：</strong> 9</p>
+<p><strong>问题概括：</strong> GitHub Actions 构建成功但部署到 GitHub Pages 失败，报错 <code>GH013: Repository rule violations found</code>，提示 <code>Push cannot contain secrets</code>。</p>
+<p><strong>问题类别：</strong> 构建流程 / CI/CD 安全</p>
+<p><strong>影响范围：</strong> GitHub Actions 自动部署流程（<code>Deploy to GitHub Pages</code> 步骤）</p>
+<p><strong>问题原因：</strong></p>
+<ul>
+<li><strong>技术根因：</strong> <code>deploy.yml</code> 通过 <code>env: VITE_GITHUB_TOKEN</code> 将敏感 Token 注入构建环境。Vite 的默认行为是将所有以 <code>VITE_</code> 开头的环境变量<strong>打包进前端 JS bundle</strong>（供浏览器端 <code>import.meta.env</code> 使用）。因此 Personal Access Token 被嵌入了 <code>dist/assets/main-xxx.js</code> 中。<code>peaceiris/actions-gh-pages</code> 将 <code>dist</code> 目录推送到 <code>gh-pages</code> 分支时，GitHub Secret Scanning 检测到 JS 文件中包含真实 Token，触发 Push Protection 机制，直接拒绝推送。</li>
+<li><strong>大白话解释：</strong> 你把家门钥匙（Token）写在了快递单上（<code>VITE_</code> 前缀变量），Vite 以为这是收货地址，直接印在了包裹外面（打包进 JS）。GitHub 安检一看：&quot;包裹上有钥匙，不能寄！&quot;</li>
+</ul>
+<p><strong>排查思路：</strong></p>
+<ol>
+<li><code>Deploy to GitHub Pages</code> 步骤报错 <code>GH013 Push Protection</code>，提示 <code>Push cannot contain secrets</code>；</li>
+<li>日志显示 <code>assets/main-ClyvosFV.js:9</code> 中包含 GitHub Personal Access Token；</li>
+<li>分析 Vite 构建机制：所有 <code>VITE_</code> 前缀变量会被自动注入前端代码；</li>
+<li>检查 <code>deploy.yml</code> 确认 <code>VITE_GITHUB_TOKEN</code> 被传入了 build 环境；</li>
+<li>推断 Token 被打包进了 JS bundle，导致部署产物中包含敏感信息；</li>
+<li>提出方案：将敏感 Token 的变量名改为非 <code>VITE_</code> 前缀（<code>GITHUB_TOKEN</code>），使 Vite 忽略它；同时修改 <code>build-ssg.js</code> 支持从 <code>process.env.GITHUB_TOKEN</code> 读取；保留其他需要暴露给前端的 <code>VITE_</code> 变量（如 <code>VITE_GISCUS_REPO_ID</code>）不变；</li>
+<li>修改后重新触发 workflow，部署成功。</li>
+</ol>
+<p><strong>最佳解决方法：</strong></p>
+<ol>
+<li>修改 <code>build-ssg.js</code>：将 Octokit 认证改为 <code>new Octokit({ auth: process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN })</code>；</li>
+<li>修改 <code>deploy.yml</code> 的 <code>.env</code> 创建步骤：不再写入 <code>VITE_GITHUB_TOKEN</code>；</li>
+<li>修改 <code>deploy.yml</code> 的 build <code>env:</code>：将 <code>VITE_GITHUB_TOKEN</code> 改为 <code>GITHUB_TOKEN</code>；</li>
+<li>其他非敏感变量（<code>VITE_GISCUS_REPO_ID</code>、<code>VITE_GISCUS_CATEGORY_ID</code> 等）保持 <code>VITE_</code> 前缀不变。</li>
+</ol>
+<p><strong>验证状态：</strong> ✅ 用户已确认（&quot;目前github action的workflows列表中已经看到部署成功了&quot;）</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="15"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>
