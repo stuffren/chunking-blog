@@ -22,7 +22,7 @@ marked.use({
   }
 });
 
-const octokit = new Octokit({ auth: process.env.VITE_GITHUB_TOKEN });
+const octokit = new Octokit({ auth: process.env.GITHUB_TOKEN || process.env.VITE_GITHUB_TOKEN });
 const OWNER = process.env.VITE_GITHUB_OWNER;
 const REPO = process.env.VITE_GITHUB_REPO;
 

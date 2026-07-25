@@ -37,7 +37,6 @@ jobs:
         run: |
           echo "VITE_GITHUB_OWNER=${{ secrets.GH_OWNER }}" > .env
           echo "VITE_GITHUB_REPO=${{ secrets.GH_REPO }}" >> .env
-          echo "VITE_GITHUB_TOKEN=${{ secrets.GH_TOKEN }}" >> .env
           echo "VITE_GISCUS_REPO_ID=${{ secrets.GISCUS_REPO_ID }}" >> .env
           echo "VITE_GISCUS_CATEGORY_ID=${{ secrets.GISCUS_CATEGORY_ID }}" >> .env
 
@@ -45,9 +44,9 @@ jobs:
       - name: Build
         run: npm run build
         env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           VITE_GITHUB_OWNER: ${{ secrets.GH_OWNER }}
           VITE_GITHUB_REPO: ${{ secrets.GH_REPO }}
-          VITE_GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
           VITE_GISCUS_REPO_ID: ${{ secrets.GISCUS_REPO_ID }}
           VITE_GISCUS_CATEGORY_ID: ${{ secrets.GISCUS_CATEGORY_ID }}
       
