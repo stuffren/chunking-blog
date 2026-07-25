@@ -32,6 +32,15 @@ jobs:
       - name: Install dependencies
         run: npm ci
       
+      # 新增：CI 环境下 .env 文件不存在，需要动态创建
+      - name: Create .env file
+        run: |
+          echo "VITE_GITHUB_OWNER=${{ secrets.GH_OWNER }}" > .env
+          echo "VITE_GITHUB_REPO=${{ secrets.GH_REPO }}" >> .env
+          echo "VITE_GITHUB_TOKEN=${{ secrets.GH_TOKEN }}" >> .env
+          echo "VITE_GISCUS_REPO_ID=${{ secrets.GISCUS_REPO_ID }}" >> .env
+          echo "VITE_GISCUS_CATEGORY_ID=${{ secrets.GISCUS_CATEGORY_ID }}" >> .env
+
       # 4. 执行构建（自动触发 SSG）
       - name: Build
         run: npm run build
