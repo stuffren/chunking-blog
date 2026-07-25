@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>About | Chunking</title>
+  <meta name="description" content="About Chunking blog">
+  <meta property="og:title" content="About">
+  <meta property="og:description" content="About Chunking blog">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/about">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <a href="/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/categories">Categories</a>
+            <a href="/tags">Tags</a>
+            <a href="/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <div class="page-about container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <a href="/">Home</a>
+        <span class="sep">/</span>
+        <span>About</span>
+      </nav>
+      <h1>About</h1>
+      <div class="about-content">
+        <p>欢迎来到我的新博客<strong>Chunking</strong> — 一个基于 GitHub Discussions 作为内容管理系统的纯前端博客平台。作者通过 GitHub Discussions 撰写和管理文章，访客通过博客站点阅读文章并留言评论。零后端、零数据库、零托管成本。</p>
+<p><strong>核心特征</strong>：构建时生成完整静态 HTML，运行时 Hydration 为 SPA，兼顾 SEO 与交互体验。</p>
+<hr>
+<h2>技术栈</h2>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>技术</th>
+<th>版本/来源</th>
+<th>约束说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>构建工具</strong></td>
+<td>Vite</td>
+<td>^5.0</td>
+<td>开发服务器、模块打包、环境变量注入、构建时 SSG 触发</td>
+</tr>
+<tr>
+<td><strong>构建时数据获取</strong></td>
+<td>Octokit Core.js</td>
+<td>^6.0</td>
+<td>仅在构建脚本中使用，运行时前端不直接调用 GitHub API</td>
+</tr>
+<tr>
+<td><strong>运行时路由</strong></td>
+<td>原生 JS SPA Router</td>
+<td>参考 jsdev.space 实现</td>
+<td>History API、动态路由参数、404 回退、Hydration 接管</td>
+</tr>
+<tr>
+<td><strong>Markdown 渲染</strong></td>
+<td>Marked.js</td>
+<td>^12.0</td>
+<td>构建时预渲染 + 运行时客户端渲染共用同一套逻辑</td>
+</tr>
+<tr>
+<td><strong>代码高亮</strong></td>
+<td>highlight.js</td>
+<td>^11.0</td>
+<td>构建时与运行时共用</td>
+</tr>
+<tr>
+<td><strong>评论系统</strong></td>
+<td>Giscus</td>
+<td>最新 CDN</td>
+<td>Web Component 方式嵌入，通过 <code>data-term</code> 绑定 Discussion number</td>
+</tr>
+<tr>
+<td><strong>样式</strong></td>
+<td>原生 CSS</td>
+<td>—</td>
+<td>CSS 变量定义设计系统，无预处理器</td>
+</tr>
+<tr>
+<td><strong>图标</strong></td>
+<td>内联 SVG / Phosphor Icons CDN</td>
+<td>—</td>
+<td>不引入图标字体</td>
+</tr>
+</tbody></table>
+
+      </div>
+    </div>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/assets/main-BfFzIf8d.js"></script>
+</body>
+</html>

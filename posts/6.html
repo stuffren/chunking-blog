@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>生产构建相关问题的修复记录汇总 | Chunking</title>
+  <meta name="description" content="修复记录 附件：E:\js_web\js_spa_router_blog\issues\生产构建问题汇总.md   生产构建问题汇总.md文件通过kimi聊天窗口中的分享按钮中的复制而得到。     需求： 请你从附件《生产构建问题汇总.md》的第一个问题：   “根据《操作说明文档》，当前我进行到了（8....">
+  <meta property="og:title" content="生产构建相关问题的修复记录汇总">
+  <meta property="og:description" content="修复记录 附件：E:\js_web\js_spa_router_blog\issues\生产构建问题汇总.md   生产构建问题汇总.md文件通过kimi聊天窗口中的分享按钮中的复制而得到。     需求： 请你从附件《生产构建问题汇总.md》的第一个问题：   “根据《操作说明文档》，当前我进行到了（8....">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/6">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <a href="/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/categories">Categories</a>
+            <a href="/tags">Tags</a>
+            <a href="/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <a href="/">Home</a>
+        <span class="sep">/</span>
+        <span>生产构建相关问题的修复记录汇总</span>
+      </nav>
+      <header class="post-header">
+        <h1>生产构建相关问题的修复记录汇总</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-23T22:34:41Z">2026年7月23日</time>
+          <a href="/categories/blog" class="category-link">Blog</a>
+          <a href="/tags/npm_run_build" class="tag">npm_run_build</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <h1>修复记录</h1>
+<p>附件：E:\js_web\js_spa_router_blog\issues\生产构建问题汇总.md<br>生产构建问题汇总.md文件通过kimi聊天窗口中的分享按钮中的复制而得到。   </p>
+<p>需求：
+请你从附件《生产构建问题汇总.md》的第一个问题：<br>“根据《操作说明文档》，当前我进行到了（8.3）预览生产构建这一步。<br>你提到了验证要点：<br>1.查看页面源代码（Ctrl+U），确认包含完整 HTML 内容<br>...<br>暂时不要输出任何代码，仅作文字交流。”<br>开始到最后一个问题。<br>请将所有关于生产构建遇到的问题和对应的成功解决方案（包括正确分析），形成一份具有先后顺序的简要的修复记录（包括问题概括，问题类别，问题原因，分析方法，最佳解决方法）<br>注意：只提取得到用户成功反馈和LLM分析绝对正确的问题，否则不提取，代码部分可以忽略。  </p>
+<p>请先基于我的需求，使用COT方式帮我分析我的它是否合理以及需要优化？如果需要优化，请帮我先优化它，然后输出给我  </p>
+<hr>
+<ul>
+<li>kimi回复得到以下优化后的需求：</li>
+</ul>
+<p>优化后的需求<br>请从附件《生产构建问题汇总.md》的第一个问题开始到最后一个问题，将所有<strong>用户明确确认已解决</strong>且<strong>具备分析逻辑闭环</strong>的问题，按时间先后顺序整理为一份修复记录。
+每条记录包含：</p>
+<ul>
+<li>序号：修复顺序</li>
+<li>问题概括：一句话描述</li>
+<li>问题类别：环境配置 / API与权限 / 路径引用 / 构建流程等（其他的可以通过问题描述进行提炼）</li>
+<li>影响范围：影响的功能或页面</li>
+<li>问题原因：根因分析</li>
+<li>排查思路：从现象到根因的推理过程</li>
+<li>最佳解决方法：最终验证成功的方案</li>
+<li>验证状态：用户已确认 / 逻辑推断（仅用户明确确认的问题收录）</li>
+<li>输出格式：采用markdown纵向罗列，不要使用markdown表格。</li>
+</ul>
+<hr>
+<ul>
+<li>kimi  </li>
+<li>20260724 06:19</li>
+</ul>
+<p> 我来重新整理修复记录，采用纵向 Markdown 格式输出。</p>
+<h1>生产构建问题修复记录</h1>
+<h2>问题 1：SSG 未执行，dist 目录无静态页面</h2>
+<p><strong>问题类别</strong>：构建流程</p>
+<p><strong>影响范围</strong>：所有 SSG 页面（posts、categories、tags、about、sitemap 等）</p>
+<p><strong>问题原因</strong>：<code>package.json</code> 的 <code>build</code> 脚本仅执行 <code>vite build</code>，缺少 <code>node build-ssg.js</code> 步骤；同时 <code>vite.config.js</code> 的 <code>writeBundle</code> 钩子缺失，导致 SSG 脚本完全未被调用。</p>
+<p><strong>排查思路</strong>：</p>
+<ol>
+<li>观察到 <code>npm run build</code> 后 <code>dist</code> 目录只有 Vite 默认输出（<code>index.html</code>、<code>assets/</code>、<code>robots.txt</code>），无 <code>posts/</code>、<code>categories/</code>、<code>tags/</code> 等子目录</li>
+<li>检查 <code>package.json</code> 发现 <code>build</code> 脚本仅执行 <code>vite build</code>，无 SSG 步骤</li>
+<li>检查 <code>vite.config.js</code> 确认无 <code>writeBundle</code> 钩子</li>
+<li>推断 SSG 脚本从未被调用，构建流程不完整</li>
+</ol>
+<p><strong>最佳解决方法</strong>：修改 <code>package.json</code> 的 <code>build</code> 脚本为 <code>&quot;vite build &amp;&amp; node --env-file=.env build-ssg.js&quot;</code>，通过 <code>&amp;&amp;</code> 串联 Vite 构建和 SSG 脚本执行。</p>
+<p><strong>验证状态</strong>：✅ 用户已确认</p>
+<hr>
+<h2>问题 2：<code>node build-ssg.js</code> 执行后无输出</h2>
+<p><strong>问题类别</strong>：构建流程</p>
+<p><strong>影响范围</strong>：同上，阻断所有 SSG 页面生成</p>
+<p><strong>问题原因</strong>：<code>build-ssg.js</code> 仅导出了 <code>generateSSG</code> 函数，未在模块顶层自动调用该函数。作为 ESM 模块，加载后函数定义完成即结束，不会自动执行。</p>
+<p><strong>排查思路</strong>：</p>
+<ol>
+<li>执行 <code>node --env-file=.env build-ssg.js</code> 后终端无任何输出</li>
+<li>检查 <code>build-ssg.js</code> 发现只有 <code>export async function generateSSG()</code>，无调用语句</li>
+<li>理解 ESM 模块加载机制：导入模块只执行顶层代码，导出函数不会自动调用</li>
+<li>推断需要在文件末尾添加自动执行逻辑</li>
+</ol>
+<p><strong>最佳解决方法</strong>：在 <code>build-ssg.js</code> 文件末尾添加 <code>generateSSG().catch(err =&gt; { console.error(&#39;❌ SSG failed:&#39;, err); process.exit(1); });</code> 实现模块自执行。</p>
+<p><strong>验证状态</strong>：✅ 用户已确认</p>
+<hr>
+<h2>问题 3：SSG 执行时 TLS 证书验证失败</h2>
+<p><strong>问题类别</strong>：环境配置</p>
+<p><strong>影响范围</strong>：阻断所有 GitHub API 请求，SSG 完全无法执行</p>
+<p><strong>问题原因</strong>：本地网络环境存在代理工具（WattToolkit / Steam++）拦截 HTTPS 连接，替换了 GitHub API 的 SSL 证书，导致 Node.js 的 TLS 证书链验证失败。</p>
+<p><strong>排查思路</strong>：</p>
+<ol>
+<li>报错信息为 <code>unable to verify the first certificate</code>，错误码 <code>UNABLE_TO_VERIFY_LEAF_SIGNATURE</code></li>
+<li>检查 HTTP 响应头发现 <code>server: &#39;github.com, WattToolkit&#39;</code>，确认代理工具介入</li>
+<li>确认 GitHub API 服务端本身无证书问题，问题出在本地网络层</li>
+<li>推断需要临时禁用 Node.js 的 TLS 验证以绕过本地代理的证书替换</li>
+</ol>
+<p><strong>最佳解决方法</strong>：在 PowerShell 中执行 <code>$env:NODE_TLS_REJECT_UNAUTHORIZED=&quot;0&quot;</code> 临时禁用 TLS 证书验证，然后执行 <code>npm run build</code>。</p>
+<p><strong>验证状态</strong>：✅ 用户已确认</p>
+<hr>
+<h2>问题 4：GitHub API 返回 404，discussions/categories 端点不存在</h2>
+<p><strong>问题类别</strong>：API 与权限</p>
+<p><strong>影响范围</strong>：分类列表页、分类详情页生成失败</p>
+<p><strong>问题原因</strong>：<code>discussions/categories</code> 不是 GitHub REST API v3 的有效端点，该端点仅存在于 GraphQL API 中。<code>build-ssg.js</code> 中使用了错误的 API 路径。</p>
+<p><strong>排查思路</strong>：</p>
+<ol>
+<li>报错 404，请求 URL 为 <code>https://api.github.com/repos/stuffren/chunking-blog/discussions/categories</code></li>
+<li>检查 <code>x-oauth-scopes</code> 确认 Token 已包含 <code>read:discussion</code> 和 <code>repo</code> 权限，排除权限问题</li>
+<li>查阅 GitHub REST API 文档，确认 <code>discussions/categories</code> 端点不存在于 v3</li>
+<li>推断应从 <code>discussions</code> 响应数据中提取 <code>category</code> 字段来构建分类信息</li>
+</ol>
+<p><strong>最佳解决方法</strong>：移除对 <code>discussions/categories</code> 的 API 调用，改为从 <code>discussions</code> 响应数据中遍历提取 <code>category</code> 字段，使用 <code>Map</code> 去重后构建分类列表。</p>
+<p><strong>验证状态</strong>：✅ 用户已确认</p>
+<hr>
+<h2>问题 5：<code>build-ssg.js</code> 的 <code>rm(DIST_DIR)</code> 删除 Vite 构建产物</h2>
+<p><strong>问题类别</strong>：构建流程</p>
+<p><strong>影响范围</strong>：<code>assets/</code> 目录、<code>robots.txt</code> 等 Vite 构建输出文件被删除，导致生产环境缺少 JS/CSS 和 SEO 文件</p>
+<p><strong>问题原因</strong>：<code>generateSSG</code> 函数开头执行 <code>rm(DIST_DIR, { recursive: true })</code>，清空了 Vite 已生成的 <code>assets/</code> 目录和 <code>robots.txt</code>，随后 SSG 只重新生成了 HTML 文件。</p>
+<p><strong>排查思路</strong>：</p>
+<ol>
+<li>发现 SSG 页面（<code>posts/1.html</code> 等）生成成功，但 <code>assets/</code> 目录和 <code>robots.txt</code> 消失</li>
+<li>检查 <code>build-ssg.js</code> 发现 <code>rm(DIST_DIR)</code> 在 <code>generateSSG</code> 开头执行</li>
+<li>梳理执行顺序：Vite 构建 → 生成 <code>dist/assets/</code> 和 <code>robots.txt</code> → SSG 执行 → <code>rm</code> 删除整个 <code>dist/</code> → 重新创建空目录 → 只写入 SSG HTML 文件 → Vite 产物丢失</li>
+<li>推断应移除 <code>rm</code> 操作，改为仅确保目录存在</li>
+</ol>
+<p><strong>最佳解决方法</strong>：删除 <code>rm(DIST_DIR, { recursive: true })</code> 语句，仅保留 <code>mkdir(DIST_DIR, { recursive: true })</code> 确保目录存在即可。</p>
+<p><strong>验证状态</strong>：✅ 用户已确认</p>
+<hr>
+<h2>问题 6：SSG 生成的 HTML 引用开发环境路径，生产环境样式/脚本 404</h2>
+<p><strong>问题类别</strong>：路径引用</p>
+<p><strong>影响范围</strong>：所有 SSG 生成的静态页面（<code>posts/1.html</code>、<code>categories.html</code>、<code>tags.html</code> 等）</p>
+<p><strong>问题原因</strong>：<code>pageTemplate</code> 函数硬编码了开发环境路径（<code>/src/styles/*.css</code>、<code>/src/main.js</code>），而生产构建后文件已被 Vite 打包到 <code>assets/</code> 目录且文件名包含内容哈希（如 <code>main-B33Ixunb.js</code>）。</p>
+<p><strong>排查思路</strong>：</p>
+<ol>
+<li>预览生产构建时打开 <code>http://localhost:4173/posts/1</code>，发现页面无样式、无交互</li>
+<li>查看页面源代码，发现引用 <code>/src/styles/variables.css</code>、<code>/src/styles/base.css</code> 等开发路径</li>
+<li>对比 Vite 构建输出，确认实际路径为 <code>assets/main-B33Ixunb.js</code> 和 <code>assets/main-Dix6Oozi.css</code></li>
+<li>推断 <code>pageTemplate</code> 模板未适配生产环境，需要动态读取 Vite 构建后的 assets 路径</li>
+</ol>
+<p><strong>最佳解决方法</strong>：</p>
+<ol>
+<li>在 <code>generateSSG</code> 开头读取 Vite 构建后的 <code>dist/index.html</code></li>
+<li>使用正则提取 <code>assets/main-*.js</code> 和 <code>assets/main-*.css</code> 的实际路径</li>
+<li>修改 <code>pageTemplate</code> 函数：移除所有 <code>/src/styles/*.css</code> 引用，改为注入动态提取的 <code>assets.css</code> 和 <code>assets.js</code> 路径</li>
+</ol>
+<p><strong>验证状态</strong>：✅ 用户已确认</p>
+<hr>
+<h2>修复记录总结</h2>
+<table>
+<thead>
+<tr>
+<th>问题类别</th>
+<th>涉及问题</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>构建流程</td>
+<td>问题 1、问题 2、问题 5</td>
+</tr>
+<tr>
+<td>环境配置</td>
+<td>问题 3</td>
+</tr>
+<tr>
+<td>API 与权限</td>
+<td>问题 4</td>
+</tr>
+<tr>
+<td>路径引用</td>
+<td>问题 6</td>
+</tr>
+</tbody></table>
+<p><strong>核心依赖链</strong>：问题 1 → 问题 2 → 问题 3 → 问题 4 → 问题 5 → 问题 6，后一个问题的修复依赖于前一个问题的成功解决。</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="6"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/assets/main-BfFzIf8d.js"></script>
+</body>
+</html>
