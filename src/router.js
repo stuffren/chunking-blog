@@ -1,4 +1,11 @@
 // SPA Router - 原生 JavaScript 实现
+
+// 新增：从 Vite 注入的环境变量读取 base 路径
+// 本地开发为 '/'，GitHub Pages 生产环境为 '/chunking-blog/'
+const BASE_PATH = import.meta.env.BASE_URL || '/';
+// 去掉末尾斜杠，用于路径拼接和匹配（如 '/chunking-blog' 或 ''）
+const BASE_PREFIX = BASE_PATH.replace(/\/$/, '');
+
 class Router {
   constructor() {
     this.routes = [];
@@ -30,24 +37,31 @@ class Router {
   // 确保 pathname 相同但 query string 不同的导航（如 /?page=2 -> /）能被正确处理
   // 修改：改为 async，确保 resolve（含异步页面组件渲染）完成后再继续
   async navigate(path, replace = false) {
-    if (this.currentRoute === path) return;
+    // 新增：如果 path 是绝对路径且未包含 BASE_PREFIX，自动补上子路径前缀
+    // 例如：用户点击 href="/posts/1" 时，实际导航到 "/chunking-blog/posts/1"
+    let fullPath = path;
+    if (BASE_PREFIX && path.startsWith('/') && !path.startsWith(BASE_PREFIX + '/')) {
+      fullPath = BASE_PREFIX + path;
+    }
     
+    if (this.currentRoute === fullPath) return;
+
     // 执行 before hooks
     for (const hook of this.beforeHooks) {
-      const result = hook(path);
+      const result = hook(fullPath);
       if (result === false) return;
     }
 
     // 更新历史
     if (replace) {
-      history.replaceState({ path }, '', path);
+      history.replaceState({ path: fullPath }, '', fullPath);
     } else {
-      history.pushState({ path }, '', path);
+      history.pushState({ path: fullPath }, '', fullPath);
     }
 
-    this.currentRoute = path;
+    this.currentRoute = fullPath;
     // 修改：await resolve，等待异步页面组件完全渲染
-    await this.resolve(path);
+    await this.resolve(fullPath);
   }
 
   // 解析并渲染路由
@@ -56,13 +70,20 @@ class Router {
   // 修改：改为 async，支持 await 异步页面组件（如 Home.js）
   async resolve(path = location.pathname + location.search) {
     this.currentRoute = path;
-    
+
     // 解析完整 URL，分离 pathname 与 query string
     const url = new URL(path, location.origin);
-    const pathname = url.pathname;
-    const query = Object.fromEntries(url.searchParams);
+    let pathname = url.pathname;
     
-    // 查找匹配的路由（基于 pathname）
+    // 新增：如果 pathname 以 BASE_PREFIX 开头，去掉前缀后再进行路由匹配
+    // 例如：/chunking-blog/posts/1 -> 匹配 /posts/1
+    if (BASE_PREFIX && pathname.startsWith(BASE_PREFIX)) {
+      pathname = pathname.slice(BASE_PREFIX.length) || '/';
+    }
+    
+    const query = Object.fromEntries(url.searchParams);
+
+    // 查找匹配的路由（基于去掉前缀后的 pathname）
     for (const route of this.routes) {
       const match = pathname.match(route.regex);
       if (match) {
@@ -78,7 +99,7 @@ class Router {
         // 执行处理器，传入 params 与 query
         // 修改：await 异步页面组件，确保 Promise 解析为 HTMLElement 后再挂载
         const result = await route.handler(params, query);
-        
+
         // 渲染到容器
         if (this.container && result) {
           this.container.innerHTML = '';
@@ -109,7 +130,7 @@ class Router {
         <div class="page-404 container">
           <h1>404</h1>
           <p>Page not found</p>
-          <a href="/">Go Home</a>
+          <a href="${BASE_PATH}/">Go Home</a>
         </div>
       `;
     }

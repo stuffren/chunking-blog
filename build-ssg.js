@@ -9,6 +9,9 @@ import { fileURLToPath } from 'url';
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const DIST_DIR = join(__dirname, 'dist');
 
+// 新增：从环境变量读取部署子路径前缀，本地为空字符串，GitHub Pages CI 为 /chunking-blog
+const BASE_PATH = process.env.BASE_PATH ? process.env.BASE_PATH.replace(/\/$/, '') : '';
+
 // 配置 marked 使用 highlight.js
 marked.use({
   renderer: {
@@ -54,11 +57,12 @@ function pageTemplate({ title, description, body, type = 'website', url, image, 
     <header class="site-header">
       <div class="container">
         <nav class="main-nav">
-          <a href="/" class="logo">chunking</a>
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="${BASE_PATH}/" class="logo">chunking</a>
           <div class="nav-links">
-            <a href="/categories">Categories</a>
-            <a href="/tags">Tags</a>
-            <a href="/about">About</a>
+            <a href="${BASE_PATH}/categories">Categories</a>
+            <a href="${BASE_PATH}/tags">Tags</a>
+            <a href="${BASE_PATH}/about">About</a>
           </div>
         </nav>
       </div>
@@ -89,8 +93,8 @@ export async function generateSSG() {
   let assets = { js: '/assets/main.js', css: '/assets/main.css' };
   try {
     const indexHtml = await readFile(join(DIST_DIR, 'index.html'), 'utf-8');
-    const jsMatch = indexHtml.match(/src="(\/assets\/[^"]+\.js)"/);
-    const cssMatch = indexHtml.match(/href="(\/assets\/[^"]+\.css)"/);
+    const jsMatch = indexHtml.match(/src="(\/[^"]+\.js)"/);
+    const cssMatch = indexHtml.match(/href="(\/[^"]+\.css)"/);
     if (jsMatch) assets.js = jsMatch[1];
     if (cssMatch) assets.css = cssMatch[1];
     console.log('Assets found:', assets);
@@ -218,7 +222,8 @@ export async function generateSSG() {
 function renderHomeBody(posts) {
   const postList = posts.map(post => `
     <article class="post-card">
-      <h2><a href="/posts/${post.number}">${escapeHtml(post.title)}</a></h2>
+      <!-- 修改：内部链接拼上 BASE_PATH -->
+      <h2><a href="${BASE_PATH}/posts/${post.number}">${escapeHtml(post.title)}</a></h2>
       <div class="post-meta">
         <time datetime="${post.created_at}">${formatDate(post.created_at)}</time>
         <span class="category-tag">${escapeHtml(post.category?.name || '')}</span>
@@ -246,7 +251,8 @@ function renderPostBody(post) {
   return `
     <article class="page-post container">
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="${BASE_PATH}/">Home</a>
         <span class="sep">/</span>
         <span>${escapeHtml(post.title)}</span>
       </nav>
@@ -254,8 +260,9 @@ function renderPostBody(post) {
         <h1>${escapeHtml(post.title)}</h1>
         <div class="post-meta">
           <time datetime="${post.created_at}">${formatDate(post.created_at)}</time>
-          <a href="/categories/${slugify(post.category?.name || '')}" class="category-link">${escapeHtml(post.category?.name || '')}</a>
-          ${(post.labels || []).map(l => `<a href="/tags/${slugify(l.name)}" class="tag">${escapeHtml(l.name)}</a>`).join('')}
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="${BASE_PATH}/categories/${slugify(post.category?.name || '')}" class="category-link">${escapeHtml(post.category?.name || '')}</a>
+          ${(post.labels || []).map(l => `<a href="${BASE_PATH}/tags/${slugify(l.name)}" class="tag">${escapeHtml(l.name)}</a>`).join('')}
         </div>
       </header>
       <div class="post-content">
@@ -282,7 +289,8 @@ function renderCategoriesListBody(categories, posts) {
   return `
     <div class="page-categories container">
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="${BASE_PATH}/">Home</a>
         <span class="sep">/</span>
         <span>Categories</span>
       </nav>
@@ -291,7 +299,8 @@ function renderCategoriesListBody(categories, posts) {
         ${categories.map(cat => {
           const count = posts.filter(p => p.category?.id === cat.id).length;
           return `
-            <a href="/categories/${slugify(cat.name)}" class="category-card">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="${BASE_PATH}/categories/${slugify(cat.name)}" class="category-card">
               <h2>${escapeHtml(cat.name)}</h2>
               <p class="category-desc">${escapeHtml(cat.description || '')}</p>
               <span class="count">${count} articles</span>
@@ -307,9 +316,10 @@ function renderCategoryBody(cat, catPosts) {
   return `
     <div class="page-category-detail container">
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="${BASE_PATH}/">Home</a>
         <span class="sep">/</span>
-        <a href="/categories">Categories</a>
+        <a href="${BASE_PATH}/categories">Categories</a>
         <span class="sep">/</span>
         <span>${escapeHtml(cat.name)}</span>
       </nav>
@@ -321,7 +331,8 @@ function renderCategoryBody(cat, catPosts) {
       <div class="post-list">
         ${catPosts.map(post => `
           <article class="post-card">
-            <h2><a href="/posts/${post.number}">${escapeHtml(post.title)}</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="${BASE_PATH}/posts/${post.number}">${escapeHtml(post.title)}</a></h2>
             <time datetime="${post.created_at}">${formatDate(post.created_at)}</time>
           </article>
         `).join('')}
@@ -336,7 +347,8 @@ function renderTagsListBody(labels, posts) {
   return `
     <div class="page-tags container">
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="${BASE_PATH}/">Home</a>
         <span class="sep">/</span>
         <span>Tags</span>
       </nav>
@@ -346,7 +358,8 @@ function renderTagsListBody(labels, posts) {
           const count = posts.filter(p => p.labels?.some(l => l.id === label.id)).length;
           const size = 0.8 + (count / maxCount) * 1.2;
           return `
-            <a href="/tags/${slugify(label.name)}" class="tag-item" style="font-size: ${size.toFixed(2)}rem">
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <a href="${BASE_PATH}/tags/${slugify(label.name)}" class="tag-item" style="font-size: ${size.toFixed(2)}rem">
               ${escapeHtml(label.name)}
               <span class="count">${count}</span>
             </a>
@@ -361,9 +374,10 @@ function renderTagBody(label, tagPosts) {
   return `
     <div class="page-tag-detail container">
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="${BASE_PATH}/">Home</a>
         <span class="sep">/</span>
-        <a href="/tags">Tags</a>
+        <a href="${BASE_PATH}/tags">Tags</a>
         <span class="sep">/</span>
         <span>${escapeHtml(label.name)}</span>
       </nav>
@@ -374,7 +388,8 @@ function renderTagBody(label, tagPosts) {
       <div class="post-list">
         ${tagPosts.map(post => `
           <article class="post-card">
-            <h2><a href="/posts/${post.number}">${escapeHtml(post.title)}</a></h2>
+            <!-- 修改：内部链接拼上 BASE_PATH -->
+            <h2><a href="${BASE_PATH}/posts/${post.number}">${escapeHtml(post.title)}</a></h2>
             <time datetime="${post.created_at}">${formatDate(post.created_at)}</time>
           </article>
         `).join('')}
@@ -388,7 +403,8 @@ function renderAboutBody(about) {
   return `
     <div class="page-about container">
       <nav class="breadcrumb" aria-label="breadcrumb">
-        <a href="/">Home</a>
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="${BASE_PATH}/">Home</a>
         <span class="sep">/</span>
         <span>About</span>
       </nav>

@@ -4,9 +4,9 @@ import { fileURLToPath } from 'url';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
-export default defineConfig(({ mode }) => {
-  const env = loadEnv(mode, process.cwd(), '');
-  
+export default defineConfig(({ command }) => {
+  const env = loadEnv(command === 'build' ? 'production' : 'development', process.cwd(), '');
+
   console.log('Env check:', {
     hasOwner: !!env.VITE_GITHUB_OWNER,
     hasRepo: !!env.VITE_GITHUB_REPO,
@@ -16,6 +16,9 @@ export default defineConfig(({ mode }) => {
   });
 
   return {
+    // 修改：仅在生产构建时根据 CI 注入的 BASE_PATH 设置资源前缀
+    // 本地开发 (npm run dev) 和预览 (npm run preview) 始终使用根路径 '/'
+    base: command === 'build' ? (process.env.BASE_PATH || '/') : '/',
     root: '.',
     build: {
       outDir: 'dist',
