@@ -1,0 +1,54 @@
+name: Build and Deploy to Custom Domain
+
+on:
+  # 推送到 custom-domain 分支时触发
+  push:
+    branches: [custom-domain]
+
+  # 支持手动触发
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      # 1. 检出代码
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 2. 设置 Node.js 环境
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: 'npm'
+
+      # 3. 安装依赖
+      - name: Install dependencies
+        run: npm ci
+
+      # 4. 动态创建 .env 文件
+      - name: Create .env file
+        run: |
+          echo "VITE_GITHUB_OWNER=${{ secrets.GH_OWNER }}" > .env
+          echo "VITE_GITHUB_REPO=${{ secrets.GH_REPO }}" >> .env
+          echo "VITE_GISCUS_REPO_ID=${{ secrets.GISCUS_REPO_ID }}" >> .env
+          echo "VITE_GISCUS_CATEGORY_ID=${{ secrets.GISCUS_CATEGORY_ID }}" >> .env
+
+      # 5. 执行构建（不设置 BASE_PATH，使用根路径 /）
+      - name: Build
+        run: npm run build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
+          VITE_GITHUB_OWNER: ${{ secrets.GH_OWNER }}
+          VITE_GITHUB_REPO: ${{ secrets.GH_REPO }}
+          VITE_GISCUS_REPO_ID: ${{ secrets.GISCUS_REPO_ID }}
+          VITE_GISCUS_CATEGORY_ID: ${{ secrets.GISCUS_CATEGORY_ID }}
+
+      # 6. 部署到 GitHub Pages（自定义域名）
+      - name: Deploy to GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GH_TOKEN }}
+          publish_dir: ./dist
