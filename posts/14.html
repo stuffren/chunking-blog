@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bug3及其衍生问题的完整修复记录 | Chunking</title>
+  <meta name="description" content="Bug3及其衍生问题的完整修复记录  bug3：当我进入到第二页分页http://localhost:5173/?page=2后，点击导航中的Logo处的首页连接http://localhost:5173/时，这个连接没有反应。但是我从其他的页面，比如文章详情页或分类列表页点击导航中的Logo处的首页连接http:...">
+  <meta property="og:title" content="Bug3及其衍生问题的完整修复记录">
+  <meta property="og:description" content="Bug3及其衍生问题的完整修复记录  bug3：当我进入到第二页分页http://localhost:5173/?page=2后，点击导航中的Logo处的首页连接http://localhost:5173/时，这个连接没有反应。但是我从其他的页面，比如文章详情页或分类列表页点击导航中的Logo处的首页连接http:...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/14">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>Bug3及其衍生问题的完整修复记录</span>
+      </nav>
+      <header class="post-header">
+        <h1>Bug3及其衍生问题的完整修复记录</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-24T19:55:43Z">2026年7月24日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/bug" class="tag">bug</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <h2>Bug3及其衍生问题的完整修复记录</h2>
+<p>bug3：当我进入到<a href="http://localhost:5173/?page=2">第二页分页</a>后，点击导航中的Logo处的<a href="http://localhost:5173/">首页连接</a>时，这个连接没有反应。但是我从其他的页面，比如文章详情页或分类列表页点击导航中的Logo处的<a href="http://localhost:5173/">首页连接</a>时，它会立马进入或回到到首页。  </p>
+<p>问题：基于以上情况，请使用cot方式对附件中的&quot;优化后的需求文档v1.3&quot;进行分析，bug3的问题可能出在哪些文件上？然后告诉我问题的原因和对应的解决方法。<br>注意：暂时不要输出任何代码，仅做文字沟通。  </p>
+<hr>
+<h3>修复记录 #4</h3>
+<p><strong>序号：</strong> 4</p>
+<p><strong>问题概括：</strong> 从首页到第 2 分页（<code>/?page=2</code>）点击导航 Logo 回首页（<code>/</code>）无反应，但从文章详情页或分类列表页点击 Logo 可正常跳转。</p>
+<p><strong>问题类别：</strong> 前端路由 / SPA Router 状态同步</p>
+<p><strong>影响范围：</strong> 首页分页后的导航（<code>/?page=2</code> → <code>/</code>）</p>
+<p><strong>问题原因：</strong></p>
+<ul>
+<li><strong>技术根因：</strong> <code>src/router.js</code> 的 <code>navigate</code> 方法在判断&quot;是否需要导航&quot;时，仅比较 URL 的 <code>pathname</code> 部分。当用户处于 <code>/?page=2</code> 时点击 Logo（<code>href=&quot;/&quot;</code>），<code>pathname</code> 都是 <code>/</code>，路由器误判为&quot;同一页面&quot;而直接短路返回，不做任何处理。同时，<code>src/pages/Home.js</code> 的分页切换直接调用原生 <code>history.pushState</code> 并手动操作 DOM，完全绕过了 <code>router.navigate()</code>，导致 <code>router.currentRoute</code> 始终停留在初始值 <code>/</code>，路由器的状态与浏览器地址栏发生了&quot;分叉&quot;。</li>
+<li><strong>大白话解释：</strong> 路由器是个&quot;记性不太好&quot;的管家。它只记&quot;你在哪个房间&quot;（pathname），不记&quot;房间里的细节&quot;（page=2）。当你从&quot;客厅（带第2页标签）&quot;点击回&quot;客厅&quot;时，它觉得&quot;你已经在客厅了&quot;，就直接无视了你的请求。更糟的是，分页按钮偷偷换房间标签时没告诉管家，导致管家一直以为你在&quot;客厅第1页&quot;。</li>
+</ul>
+<p><strong>排查思路：</strong></p>
+<ol>
+<li>提取关键差异：只有&quot;当前 pathname 与目标 pathname 相同、但 query string 不同&quot;的场景出现问题（<code>/?page=2</code> → <code>/</code>），而跨页面导航（<code>/categories</code> → <code>/</code>）正常，推断路由拦截逻辑对 query string 支持不完整。</li>
+<li>检查 <code>src/router.js</code> 的 <code>navigate</code> 方法，发现短路判断 <code>if (this.currentRoute === path) return;</code> 中 <code>path</code> 实际仅为 pathname，未包含 search。</li>
+<li>检查 <code>src/pages/Home.js</code> 发现分页切换使用 <code>history.pushState</code> + <code>renderHome()</code> 手动操作 DOM，未走 router 的 <code>navigate</code> 方法，导致 router 内部状态始终为 <code>/</code>。</li>
+<li>检查 <code>src/components/Header.js</code> 确认 Logo 为普通 <code>&lt;a href=&quot;/&quot;&gt;</code>，无自定义拦截逻辑，排除 Header 问题。</li>
+<li>提出方案 B：让 router 原生支持完整路径（pathname + search），<code>resolve</code> 分离 query 并传给页面 handler；Home.js 分页切换统一走 <code>router.navigate</code>。</li>
+</ol>
+<p><strong>最佳解决方法：</strong></p>
+<ol>
+<li>修改 <code>src/router.js</code>：<ul>
+<li><code>navigate</code> 接收完整路径（pathname + search），<code>currentRoute</code> 存储完整路径；</li>
+<li><code>resolve</code> 使用 <code>new URL()</code> 分离 pathname 与 search，将 query 对象作为第二个参数传给 <code>route.handler(params, query)</code>；</li>
+<li><code>init()</code> 和 <code>popstate</code> 中传递完整路径。</li>
+</ul>
+</li>
+<li>修改 <code>src/pages/Home.js</code>：<ul>
+<li>导入 <code>router</code>；</li>
+<li><code>onPageChange</code> 回调中使用 <code>router.navigate(url.pathname + url.search)</code> 替代原生 <code>history.pushState</code>；</li>
+<li>删除 <code>renderHome</code> 辅助函数，避免与 router 渲染逻辑重复。</li>
+</ul>
+</li>
+<li>兼容性微调 <code>src/pages/*.js</code>（除 Home 外）：所有页面组件函数签名增加 <code>query = {}</code> 默认参数。</li>
+</ol>
+<p><strong>验证状态：</strong> ✅ 用户已确认</p>
+<hr>
+<h3>修复记录 #5</h3>
+<p><strong>序号：</strong> 5</p>
+<p><strong>问题概括：</strong> Bug 3 修复后，首页第 2 分页（<code>/?page=2</code>）显示的文章列表与第 1 页完全相同（均为 10 篇），且分页控件只有 <code>Next →</code> 没有 <code>← Last</code> 返回按钮。</p>
+<p><strong>问题类别：</strong> 前端路由 / 参数传递 / DOM 渲染</p>
+<p><strong>影响范围：</strong> 首页分页功能（<code>/?page=2</code>）</p>
+<p><strong>问题原因：</strong></p>
+<ul>
+<li><strong>技术根因：</strong> 表面原因是 <code>src/router.js</code> 的 <code>resolve</code> 方法调用异步页面组件时未加 <code>await</code>，导致返回的 Promise 对象被误判为&quot;非 HTMLElement&quot;，DOM 挂载失败。但根本原因是 <code>src/main.js</code> 中注册路由 handler 时使用了无参函数 <code>async () =&gt; { ... }</code>，完全丢弃了 <code>router.js</code> 传递的 <code>params</code> 和 <code>query</code>。当用户进入 <code>/?page=2</code> 时，<code>Home()</code> 被调用时未传入 <code>{ page: 2 }</code>，默认 <code>page = 1</code>，因此始终渲染第 1 页内容。同时 <code>main.js</code> 的 handler 内部手动操作 DOM（<code>app.innerHTML = &#39;&#39;</code>、<code>app.appendChild(content)</code>），架空了 <code>router.js</code> 的统一渲染体系，使 router 的 <code>this.container</code> 设置形同虚设。</li>
+<li><strong>大白话解释：</strong> 想象 router 是个&quot;快递分拣员&quot;，它把包裹（query 参数）和地址（params）一起交给楼下门卫（main.js 的 handler）。但门卫是个&quot;马大哈&quot;，拿到包裹后看都不看就扔进了垃圾桶，然后自己跑去找仓库管理员（Home 组件）说&quot;老样子，来一份默认套餐&quot;。同时门卫还抢了分拣员的活，自己把货搬上了货架（手动操作 DOM），导致分拣员站在一旁无事可做。结果就是：地址栏显示&quot;第2页&quot;，但实际送上来的是&quot;第1页&quot;的货。</li>
+</ul>
+<p><strong>排查思路：</strong></p>
+<ol>
+<li>观察症状对称性：第 2 页内容错误 + 分页按钮状态错误，一致指向 <code>Home</code> 组件拿到的 <code>query.page</code> 不是 <code>2</code>。</li>
+<li>检查 <code>router.js</code> 的 query 解析链路：<code>new URL()</code> → <code>searchParams</code> → <code>Object.fromEntries</code> → <code>route.handler(params, query)</code>，确认 query 解析和传递逻辑本身正确。</li>
+<li>检查 <code>router.js</code> 的 <code>resolve</code> 方法发现 <code>const result = route.handler(params, query)</code> 缺少 <code>await</code>，异步 handler 返回 Promise 未被等待。修改 <code>navigate</code> 和 <code>resolve</code> 为 <code>async</code> 并添加 <code>await</code>。</li>
+<li>修改后问题仍存在，在 <code>router.js</code> 和 <code>Home.js</code> 添加 <code>console.log</code> 验证，确认日志正常输出，代码已生效。</li>
+<li>检查 <code>src/main.js</code>，发现路由 handler 签名是 <code>async () =&gt; { ... }</code>，未接收 <code>params</code> 和 <code>query</code>；内部调用 <code>await Home()</code> 未传参；handler 内部手动操作 DOM 未 <code>return</code> 任何值。</li>
+<li>推断根因：<code>main.js</code> 的 handler 丢弃了 router 传递的 query，且手动 DOM 操作架空了 router 的渲染体系。</li>
+</ol>
+<p><strong>最佳解决方法：</strong></p>
+<ol>
+<li>修改 <code>src/router.js</code>：将 <code>navigate</code> 和 <code>resolve</code> 改为 <code>async</code> 函数，在调用 <code>route.handler(params, query)</code> 前添加 <code>await</code>，确保异步页面组件完全执行并返回 HTMLElement 后再挂载到容器。</li>
+<li>修改 <code>src/main.js</code>：<ul>
+<li>所有路由 handler 改为接收 <code>(params, query)</code> 两个参数；</li>
+<li>将参数传给对应页面组件（如 <code>await Home(params, query)</code>）；</li>
+<li>handler 直接 <code>return</code> 页面组件生成的 DOM 元素，不再内部手动操作 DOM（删除 <code>const app = ...</code>、<code>app.innerHTML = &#39;&#39;</code>、<code>app.appendChild(content)</code> 等代码）；</li>
+<li>由 <code>router.js</code> 的 <code>resolve</code> 方法统一负责 DOM 挂载。</li>
+</ul>
+</li>
+</ol>
+<p><strong>验证状态：</strong> ✅ 用户已确认</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="14"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>首页文章列表中部分文章没有显示出来的修复记录 | Chunking</title>
+  <meta name="description" content="问题： 本地开发环境下，GitHub Discussions 已发布 10 篇文章，但博客首页仅显示 9 篇。  问题类别： 缓存机制 / 数据同步  影响范围： 首页文章列表（/ 路由，本地 npm run dev 环境）  问题原因： src/api/cache.js 实现的 localStorage ...">
+  <meta property="og:title" content="首页文章列表中部分文章没有显示出来的修复记录">
+  <meta property="og:description" content="问题： 本地开发环境下，GitHub Discussions 已发布 10 篇文章，但博客首页仅显示 9 篇。  问题类别： 缓存机制 / 数据同步  影响范围： 首页文章列表（/ 路由，本地 npm run dev 环境）  问题原因： src/api/cache.js 实现的 localStorage ...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/11">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>首页文章列表中部分文章没有显示出来的修复记录</span>
+      </nav>
+      <header class="post-header">
+        <h1>首页文章列表中部分文章没有显示出来的修复记录</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-24T13:50:42Z">2026年7月24日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/bug" class="tag">bug</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <p><strong>问题：</strong> 本地开发环境下，GitHub Discussions 已发布 10 篇文章，但博客首页仅显示 9 篇。</p>
+<p><strong>问题类别：</strong> 缓存机制 / 数据同步</p>
+<p><strong>影响范围：</strong> 首页文章列表（<code>/</code> 路由，本地 <code>npm run dev</code> 环境）</p>
+<p><strong>问题原因：</strong> <code>src/api/cache.js</code> 实现的 <code>localStorage</code> 单层缓存对文章列表设置了 5 分钟 TTL。用户在 GitHub Discussions 发布第 10 篇文章后，立即刷新本地首页，此时缓存尚未过期，前端直接返回了缓存中的旧数据（仅包含之前抓取的 9 篇），导致新文章未出现在列表中。</p>
+<p><strong>排查思路：</strong></p>
+<ol>
+<li>区分构建时与运行时数据流，确认 <code>npm run dev</code> 属于运行时动态拉取模式，问题应聚焦在 <code>src/api/github.js</code>、<code>src/api/cache.js</code>、<code>src/pages/Home.js</code> 三个文件；</li>
+<li>基于需求文档第 5 节缓存规范，推断可能是 <code>localStorage</code> 缓存未过期导致数据不同步；</li>
+<li>给出四步排查建议：① 清理 localStorage 缓存；② 检查网络请求返回数组长度；③ 检查分页控件是否隐藏了第 10 篇；④ 核对第 10 篇的 Discussion Category 是否为 <code>Blog</code>；</li>
+<li>用户执行第一步后，第 10 篇文章立即显示，验证根因为缓存层问题。</li>
+</ol>
+<p><strong>最佳解决方法：</strong> 打开浏览器 DevTools → Application → LocalStorage → 删除所有 <code>ck_</code> 前缀的缓存键 → 刷新页面。新文章随即正常显示。</p>
+<p><strong>验证状态：</strong> 用户已确认</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="11"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>

@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分类页显示空白问题修复记录 | Chunking</title>
+  <meta name="description" content="我的需求：    请从附件《分类页显示空白问题汇总.md》的第一个问题开始到最后一个问题使用COT方式进行完整分析，将所有用户明确确认已解决且具备分析逻辑闭环的问题，按时间先后顺序整理为一份修复记录。  每条记录包含： - 序号：修复顺序 - 问题概括：一句话描述 - 问题类别：环境配置 / API与权限 ...">
+  <meta property="og:title" content="分类页显示空白问题修复记录">
+  <meta property="og:description" content="我的需求：    请从附件《分类页显示空白问题汇总.md》的第一个问题开始到最后一个问题使用COT方式进行完整分析，将所有用户明确确认已解决且具备分析逻辑闭环的问题，按时间先后顺序整理为一份修复记录。  每条记录包含： - 序号：修复顺序 - 问题概括：一句话描述 - 问题类别：环境配置 / API与权限 ...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/8">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>分类页显示空白问题修复记录</span>
+      </nav>
+      <header class="post-header">
+        <h1>分类页显示空白问题修复记录</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-24T11:34:07Z">2026年7月24日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/bug" class="tag">bug</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>我的需求：<br>请从附件《分类页显示空白问题汇总.md》的第一个问题开始到最后一个问题使用COT方式进行完整分析，将所有<strong>用户明确确认已解决</strong>且<strong>具备分析逻辑闭环</strong>的问题，按时间先后顺序整理为一份修复记录。</p>
+<p>每条记录包含：</p>
+<ul>
+<li>序号：修复顺序</li>
+<li>问题概括：一句话描述</li>
+<li>问题类别：环境配置 / API与权限 / 路径引用 / 构建流程等（其他类别的请从文档描述中提炼）</li>
+<li>影响范围：影响的功能或页面</li>
+<li>问题原因：根因分析</li>
+<li>排查思路：从现象到根因的推理过程</li>
+<li>最佳解决方法：最终验证成功的方案（包括代码部分）</li>
+<li>验证状态：用户已确认 / 逻辑推断（仅用户明确确认的问题收录）</li>
+<li>输出格式：采用markdown纵向罗列，不要使用markdown表格。</li>
+</ul>
+<p>以下是对附件《分类页显示空白问题汇总.md》的 COT 完整分析，以及最终整理出的修复记录。</p>
+<hr>
+<ul>
+<li>kimi  </li>
+<li>20260724 19:29</li>
+</ul>
+<h2>COT 分析过程</h2>
+<h3>步骤一：识别文档中存在的独立问题</h3>
+<p>通读全文后，文档中实际出现了两个层面的现象：</p>
+<ol>
+<li><strong>问题 A（核心问题）</strong>：浏览器控制台报错 <code>discussions/categories 404</code>，导致 <code>/categories</code> 页面空白、<code>/categories/:slug</code> 无法正常渲染。</li>
+<li><strong>问题 B（衍生疑问）</strong>：在问题 A 通过降级代码修复后，用户发现浏览器地址栏直接访问 <code>https://api.github.com/repos/.../discussions/categories</code> 仍然返回 404，询问是否有必要处理。</li>
+</ol>
+<h3>步骤二：判断问题 A 是否满足收录标准</h3>
+<ul>
+<li><strong>用户明确确认已解决</strong>：是。用户原话为&quot;现在成功解决了分类页空白的问题，当前分类列表页和分类详情页都能够正常显示了&quot;。</li>
+<li><strong>分析逻辑是否闭环</strong>：是。完整链条为：页面空白 → 控制台 404 报错 → 定位到 <code>Categories.js</code> 调用 <code>getCategories()</code> 失败 → 确认 Token 权限无误 → 推断 REST 端点本身不稳定 → 采用降级方案从 <code>discussions</code> 数据中提取分类 → 页面恢复正常。</li>
+</ul>
+<h3>步骤三：判断问题 B 是否满足收录标准</h3>
+<ul>
+<li><strong>用户明确确认已解决</strong>：否。问题 B 的性质是&quot;预期行为确认&quot;，而非&quot;故障修复&quot;。Kimi 分析指出浏览器直接访问 API 不带认证，返回 404 是 GitHub 的安全设计，且降级处理已确保应用功能完全正常。用户未表示反对，但也未以&quot;已解决&quot;确认此现象。</li>
+<li><strong>结论</strong>：问题 B 属于排查过程中的辅助验证信息，不单独列为修复记录。</li>
+</ul>
+<h3>步骤四：排除未验证的方案</h3>
+<p>文档中提到了方案 3（GraphQL API 替代），但用户明确选择了方案 2，且方案 3 未经过实际验证，因此不收录。</p>
+<h3>步骤五：确定最终收录数量</h3>
+<p>仅收录 <strong>1 条</strong>修复记录。</p>
+<hr>
+<h2>修复记录</h2>
+<h3>问题 1：GitHub REST API discussions/categories 端点 404 导致分类页空白</h3>
+<p><strong>问题类别</strong>：API 与权限 / 容错降级</p>
+<p><strong>影响范围</strong>：分类列表页（<code>/categories</code>）和分类详情页（<code>/categories/:slug</code>）</p>
+<p><strong>问题原因</strong>：GitHub REST API v3 的 <code>/repos/{owner}/{repo}/discussions/categories</code> 端点在特定情况下返回 404（即使用户 Token 已正确勾选 <code>read:discussion</code> 权限）。<code>src/api/github.js</code> 中的 <code>getCategories()</code> 方法未对此异常做容错处理，导致 <code>Categories.js</code> 中 <code>await Promise.all([api.getCategories(), ...])</code> 抛出未捕获错误，页面渲染中断，分类页显示为空白。</p>
+<p><strong>排查思路</strong>：</p>
+<ol>
+<li>观察到浏览器控制台存在两条关联报错：一是 <code>GET discussions/categories</code> 返回 404；二是 <code>Categories.js:6</code> 的 <code>Promise.all</code> 调用链抛出 <code>Uncaught (in promise) HttpError: Not Found</code>。</li>
+<li>验证 <code>https://api.github.com/repos/stuffren/chunking-blog/discussions</code> 可正常返回，说明基础仓库访问权限和 Token 有效性无问题。</li>
+<li>用户二次确认 Token 已勾选 <code>read:discussion</code> 权限，排除权限缺失导致的 404。</li>
+<li>推断该 REST 端点本身存在稳定性问题或需要特定调用条件，不适合作为唯一数据源。</li>
+<li>提出降级思路：既然 <code>discussions</code> 接口正常且每篇 discussion 对象内嵌了完整的 <code>category</code> 信息，可以从已缓存或实时获取的 discussions 数据中逆向提取去重后的分类列表，作为 API 失败时的 fallback。</li>
+</ol>
+<p><strong>最佳解决方法</strong>：修改 <code>src/api/github.js</code> 中的 <code>getCategories()</code> 方法，增加 <code>try-catch</code> 容错降级逻辑。当 <code>discussions/categories</code> 端点请求失败时，自动调用 <code>getDiscussions()</code> 获取文章列表，遍历每篇文章的 <code>category</code> 字段，通过 <code>Map</code> 按 <code>id</code> 去重后返回分类数组。</p>
+<p>具体代码修改如下：</p>
+<pre><code class="hljs language-javascript"><span class="hljs-comment">// src/api/github.js</span>
+<span class="hljs-keyword">export</span> <span class="hljs-keyword">const</span> api = {
+  <span class="hljs-comment">// ... 其他方法保持不变 ...</span>
+
+  <span class="hljs-comment">// 修改：增加 try-catch 降级处理</span>
+  <span class="hljs-keyword">async</span> <span class="hljs-title function_">getCategories</span>(<span class="hljs-params"></span>) {
+    <span class="hljs-keyword">try</span> {
+      <span class="hljs-keyword">return</span> <span class="hljs-keyword">await</span> <span class="hljs-title function_">fetchWithCache</span>(<span class="hljs-string">&#x27;categories&#x27;</span>, <span class="hljs-string">&#x27;all&#x27;</span>, <span class="hljs-title function_">async</span> () =&gt; {
+        <span class="hljs-keyword">const</span> { data } = <span class="hljs-keyword">await</span> octokit.<span class="hljs-title function_">request</span>(
+          <span class="hljs-string">&#x27;GET /repos/{owner}/{repo}/discussions/categories&#x27;</span>,
+          { <span class="hljs-attr">owner</span>: <span class="hljs-variable constant_">OWNER</span>, <span class="hljs-attr">repo</span>: <span class="hljs-variable constant_">REPO</span> }
+        );
+        <span class="hljs-keyword">return</span> data;
+      }, <span class="hljs-number">30</span> * <span class="hljs-number">60</span> * <span class="hljs-number">1000</span>); <span class="hljs-comment">// 30分钟</span>
+    } <span class="hljs-keyword">catch</span> (error) {
+      <span class="hljs-variable language_">console</span>.<span class="hljs-title function_">warn</span>(<span class="hljs-string">&#x27;Failed to fetch categories, falling back to discussions:&#x27;</span>, error);
+      <span class="hljs-comment">// 降级：从 discussions 中提取唯一分类</span>
+      <span class="hljs-keyword">const</span> discussions = <span class="hljs-keyword">await</span> <span class="hljs-variable language_">this</span>.<span class="hljs-title function_">getDiscussions</span>(<span class="hljs-number">1</span>, <span class="hljs-number">100</span>);
+      <span class="hljs-keyword">const</span> categoryMap = <span class="hljs-keyword">new</span> <span class="hljs-title class_">Map</span>();
+      discussions.<span class="hljs-title function_">forEach</span>(<span class="hljs-function"><span class="hljs-params">d</span> =&gt;</span> {
+        <span class="hljs-keyword">if</span> (d.<span class="hljs-property">category</span> &amp;&amp; !categoryMap.<span class="hljs-title function_">has</span>(d.<span class="hljs-property">category</span>.<span class="hljs-property">id</span>)) {
+          categoryMap.<span class="hljs-title function_">set</span>(d.<span class="hljs-property">category</span>.<span class="hljs-property">id</span>, d.<span class="hljs-property">category</span>);
+        }
+      });
+      <span class="hljs-keyword">return</span> <span class="hljs-title class_">Array</span>.<span class="hljs-title function_">from</span>(categoryMap.<span class="hljs-title function_">values</span>());
+    }
+  },
+
+  <span class="hljs-comment">// ... 其他方法保持不变 ...</span>
+};</code></pre><p><strong>验证状态</strong>：✅ 用户已确认（&quot;现在成功解决了分类页空白的问题，当前分类列表页和分类详情页都能够正常显示了&quot;）</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="8"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>

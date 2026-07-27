@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>分页第二页没有分页按钮的修复记录 | Chunking</title>
+  <meta name="description" content="分页第二页没有分页按钮的修复记录   问题概括： 点击首页分页进入第 2 页（/?page=2）后，分页按钮消失。  问题类别： 前端逻辑 / 分页计算  影响范围： 首页分页组件（第 2 页及以后）  问题原因： src/pages/Home.js 中使用 posts.length（当前页返回的数组长...">
+  <meta property="og:title" content="分页第二页没有分页按钮的修复记录">
+  <meta property="og:description" content="分页第二页没有分页按钮的修复记录   问题概括： 点击首页分页进入第 2 页（/?page=2）后，分页按钮消失。  问题类别： 前端逻辑 / 分页计算  影响范围： 首页分页组件（第 2 页及以后）  问题原因： src/pages/Home.js 中使用 posts.length（当前页返回的数组长...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/13">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>分页第二页没有分页按钮的修复记录</span>
+      </nav>
+      <header class="post-header">
+        <h1>分页第二页没有分页按钮的修复记录</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-24T14:02:15Z">2026年7月24日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/bug" class="tag">bug</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <h3>分页第二页没有分页按钮的修复记录</h3>
+<p><strong>问题概括：</strong> 点击首页分页进入第 2 页（<code>/?page=2</code>）后，分页按钮消失。</p>
+<p><strong>问题类别：</strong> 前端逻辑 / 分页计算</p>
+<p><strong>影响范围：</strong> 首页分页组件（第 2 页及以后）</p>
+<p><strong>问题原因：</strong> <code>src/pages/Home.js</code> 中使用 <code>posts.length</code>（当前页返回的数组长度）计算 <code>totalPages</code>。第 2 页仅返回 3 篇文章，<code>posts.length = 3</code>，导致 <code>Math.ceil(3 / 10) = 1</code>，条件 <code>totalPages &gt; 1</code> 不成立，分页按钮被隐藏。</p>
+<p><strong>排查思路：</strong></p>
+<ol>
+<li>观察 Bug 1 和 Bug 2 呈对称异常（首页有分页但列表未截断，第 2 页列表正确但无分页），推断 <code>Home.js</code> 中&quot;切片逻辑&quot;和&quot;分页传参逻辑&quot;存在耦合错误；</li>
+<li>检查 <code>Home.js</code> 发现 <code>totalPosts = posts.length</code> 使用了当前页数据长度；</li>
+<li>推断 Pagination 组件接收了错误的数据源（切片后的子数组长度而非全量总数）；</li>
+<li>提出应基于全量文章总数计算分页，修改 <code>Home.js</code> 引入 <code>api.getTotalDiscussions()</code> 作为全量计数源。</li>
+</ol>
+<p><strong>最佳解决方法：</strong></p>
+<ol>
+<li>在 <code>src/api/github.js</code> 中新增 <code>getTotalDiscussions()</code> 方法：通过 <code>per_page: 100</code> 获取全量文章并返回数组长度，缓存键使用 <code>discussions_total</code>，TTL 与文章列表一致（5 分钟）；</li>
+<li>在 <code>src/pages/Home.js</code> 中，使用 <code>api.getTotalDiscussions()</code> 获取全量文章总数（13）替代 <code>posts.length</code>，用于计算 <code>totalPages</code> 并传给 Pagination 组件。</li>
+</ol>
+<p><strong>验证状态：</strong> ✅ 用户已确认</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="13"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>

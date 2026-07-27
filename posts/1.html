@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>优化后的需求文档v1.3 | Chunking</title>
+  <meta name="description" content="最新需求文档 v1.3     一、项目定位  Chunking — 一个基于 GitHub Discussions 作为内容管理系统的纯前端博客平台。作者通过 GitHub Discussions 撰写和管理文章，访客通过博客站点阅读文章并留言评论。零后端、零数据库、零托管成本。  核心特征：构建时生...">
+  <meta property="og:title" content="优化后的需求文档v1.3">
+  <meta property="og:description" content="最新需求文档 v1.3     一、项目定位  Chunking — 一个基于 GitHub Discussions 作为内容管理系统的纯前端博客平台。作者通过 GitHub Discussions 撰写和管理文章，访客通过博客站点阅读文章并留言评论。零后端、零数据库、零托管成本。  核心特征：构建时生...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/1">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>优化后的需求文档v1.3</span>
+      </nav>
+      <header class="post-header">
+        <h1>优化后的需求文档v1.3</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-22T10:06:47Z">2026年7月22日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/documentation" class="tag">documentation</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <h1>最新需求文档 v1.3</h1>
+<h2>一、项目定位</h2>
+<p><strong>Chunking</strong> — 一个基于 GitHub Discussions 作为内容管理系统的纯前端博客平台。作者通过 GitHub Discussions 撰写和管理文章，访客通过博客站点阅读文章并留言评论。零后端、零数据库、零托管成本。</p>
+<p><strong>核心特征</strong>：构建时生成完整静态 HTML，运行时 Hydration 为 SPA，兼顾 SEO 与交互体验。</p>
+<hr>
+<h2>二、技术选型约束</h2>
+<table>
+<thead>
+<tr>
+<th>层级</th>
+<th>技术</th>
+<th>版本/来源</th>
+<th>约束说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>构建工具</strong></td>
+<td>Vite</td>
+<td>^5.0</td>
+<td>开发服务器、模块打包、环境变量注入、构建时 SSG 触发</td>
+</tr>
+<tr>
+<td><strong>构建时数据获取</strong></td>
+<td>Octokit Core.js</td>
+<td>^6.0</td>
+<td>仅在构建脚本中使用，运行时前端不直接调用 GitHub API</td>
+</tr>
+<tr>
+<td><strong>运行时路由</strong></td>
+<td>原生 JS SPA Router</td>
+<td>参考 jsdev.space 实现</td>
+<td>History API、动态路由参数、404 回退、Hydration 接管</td>
+</tr>
+<tr>
+<td><strong>Markdown 渲染</strong></td>
+<td>Marked.js</td>
+<td>^12.0</td>
+<td>构建时预渲染 + 运行时客户端渲染共用同一套逻辑</td>
+</tr>
+<tr>
+<td><strong>代码高亮</strong></td>
+<td>highlight.js</td>
+<td>^11.0</td>
+<td>构建时与运行时共用</td>
+</tr>
+<tr>
+<td><strong>评论系统</strong></td>
+<td>Giscus</td>
+<td>最新 CDN</td>
+<td>Web Component 方式嵌入，通过 <code>data-term</code> 绑定 Discussion number</td>
+</tr>
+<tr>
+<td><strong>样式</strong></td>
+<td>原生 CSS</td>
+<td>—</td>
+<td>CSS 变量定义设计系统，无预处理器</td>
+</tr>
+<tr>
+<td><strong>图标</strong></td>
+<td>内联 SVG / Phosphor Icons CDN</td>
+<td>—</td>
+<td>不引入图标字体</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>三、页面结构规范</h2>
+<h3>3.1 共用布局</h3>
+<pre><code class="hljs language-plaintext">┌─────────────────────────────────────┐
+│  <span class="hljs-selector-tag">Header</span>                             │
+│  <span class="hljs-selector-attr">[Logo: chunking]</span> <span class="hljs-selector-attr">[Categories]</span> <span class="hljs-selector-attr">[Tags]</span> <span class="hljs-selector-attr">[About]</span> │
+├─────────────────────────────────────┤
+│  <span class="hljs-selector-tag">Main</span> <span class="hljs-attribute">Content</span> (动态路由区域)         │
+├─────────────────────────────────────┤
+│  <span class="hljs-selector-tag">Footer</span>                             │
+│  © <span class="hljs-number">2026</span> Vanilla JS Development - <span class="hljs-attribute">All</span> rights reserved │
+└─────────────────────────────────────┘</code></pre><h3>3.2 路由表</h3>
+<table>
+<thead>
+<tr>
+<th>路由</th>
+<th>页面类型</th>
+<th>布局内容</th>
+<th>构建时输出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>/</code></td>
+<td>一级</td>
+<td>文章列表 + 分页</td>
+<td><code>dist/index.html</code></td>
+</tr>
+<tr>
+<td><code>/categories</code></td>
+<td>一级</td>
+<td>分类卡片网格</td>
+<td><code>dist/categories.html</code></td>
+</tr>
+<tr>
+<td><code>/categories/:slug</code></td>
+<td>二级</td>
+<td>面包屑 + 分类统计 + 简介 + 文章列表</td>
+<td><code>dist/categories/{slug}.html</code></td>
+</tr>
+<tr>
+<td><code>/tags</code></td>
+<td>一级</td>
+<td>标签云/列表</td>
+<td><code>dist/tags.html</code></td>
+</tr>
+<tr>
+<td><code>/tags/:slug</code></td>
+<td>二级</td>
+<td>面包屑 + 标签统计 + 简介 + 文章列表</td>
+<td><code>dist/tags/{slug}.html</code></td>
+</tr>
+<tr>
+<td><code>/about</code></td>
+<td>一级</td>
+<td>博客简介</td>
+<td><code>dist/about.html</code></td>
+</tr>
+<tr>
+<td><code>/posts/:id</code></td>
+<td>二级</td>
+<td>面包屑 + 博文详情 + Giscus 评论</td>
+<td><code>dist/posts/{id}.html</code></td>
+</tr>
+</tbody></table>
+<h3>3.3 面包屑规范</h3>
+<pre><code class="hljs language-plaintext">首页 &gt; Categories &gt; Astro        (分类详情页)
+首页 &gt; Tags &gt; Tailwind           (标签详情页)
+首页 &gt; Posts &gt; 文章标题          (文章详情页)</code></pre><hr>
+<h2>四、数据流规范</h2>
+<h3>4.1 GitHub 数据模型映射</h3>
+<pre><code class="hljs language-plaintext">GitHub Discussions  ←→  博客文章
+├── title           ←→  文章标题
+├── <span class="hljs-selector-tag">body</span> (Markdown) ←→  文章内容
+├── category        ←→  博客分类 (Categories)
+├── labels          ←→  博客标签 (Tags)
+├── createdAt       ←→  发布日期
+├── updatedAt       ←→  更新日期
+├── author          ←→  作者信息
+├── number          ←→  文章 ID (用于路由)
+└── comments        ←→  通过 Giscus 展示，不直接读取</code></pre><h3>4.2 特殊分类约定</h3>
+<table>
+<thead>
+<tr>
+<th>Discussion Category</th>
+<th>用途</th>
+<th>是否展示在博客列表</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>Blog</code></td>
+<td>普通博客文章</td>
+<td>✅ 是</td>
+</tr>
+<tr>
+<td><code>About</code></td>
+<td>关于页面内容</td>
+<td>❌ 否，仅用于 <code>/about</code> 路由</td>
+</tr>
+<tr>
+<td><code>Draft</code></td>
+<td>草稿</td>
+<td>❌ 否</td>
+</tr>
+</tbody></table>
+<h3>4.3 构建时数据流</h3>
+<pre><code class="hljs language-plaintext">构建触发（CI 或手动）
+    │
+    ▼
+┌─────────────────┐
+│ <span class="hljs-number">1</span>. 通过 Octokit  │──── 一次性拉取全部 Discussions、Categories、Labels
+│    拉取 GitHub   │
+│    Discussions   │
+└─────────────────┘
+    │
+    ▼
+┌─────────────────┐
+│ <span class="hljs-number">2</span>. 数据分类处理  │──── 过滤、分组、统计
+│    &amp; 内容渲染    │
+└─────────────────┘
+    │
+    ▼
+┌─────────────────┐
+│ <span class="hljs-number">3</span>. 生成静态 HTML │──── 每页独立 HTML 文件，含完整内容 + <span class="hljs-keyword">meta</span> 标签
+│    + sitemap.<span class="hljs-keyword">xml</span> <span class="hljs-title">│
+└─────────────────┘
+    │
+    ▼
+┌─────────────────┐
+│ 4</span>. 部署到 CDN    │
+└─────────────────┘</code></pre><h3>4.4 运行时数据流</h3>
+<pre><code class="hljs language-plaintext">用户请求页面
+    │
+    ▼
+┌─────────────────┐
+│ CDN 返回预渲染   │──── 搜索引擎直接抓取完整 <span class="hljs-selector-tag">HTML</span>
+│ 的静态 <span class="hljs-selector-tag">HTML</span>      │
+└─────────────────┘
+    │
+    ▼
+┌─────────────────┐
+│ 浏览器加载 JS    │──── 执行 Hydration
+└─────────────────┘
+    │
+    ▼
+┌─────────────────┐
+│ JS 接管为 SPA   │──── 后续导航无刷新，客户端路由
+│ 缓存层介入      │──── localStorage 缓存 API 响应
+└─────────────────┘</code></pre><hr>
+<h2>五、缓存规范</h2>
+<h3>5.1 策略</h3>
+<ul>
+<li><strong>单层缓存</strong>：仅使用 <code>localStorage</code>，不保留内存缓存层</li>
+<li><strong>缓存键前缀</strong>：<code>ck_</code></li>
+<li><strong>默认 TTL</strong>：5 分钟</li>
+<li><strong>分类/标签缓存 TTL</strong>：30 分钟（变更频率低）</li>
+<li><strong>文章详情缓存 TTL</strong>：10 分钟</li>
+<li><strong>清理机制</strong>：过期自动清理；支持按模式批量清除</li>
+</ul>
+<h3>5.2 缓存范围</h3>
+<table>
+<thead>
+<tr>
+<th>数据类型</th>
+<th>是否缓存</th>
+<th>TTL</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>文章列表（分页）</td>
+<td>✅</td>
+<td>5 分钟</td>
+</tr>
+<tr>
+<td>单篇文章详情</td>
+<td>✅</td>
+<td>10 分钟</td>
+</tr>
+<tr>
+<td>分类列表</td>
+<td>✅</td>
+<td>30 分钟</td>
+</tr>
+<tr>
+<td>标签列表</td>
+<td>✅</td>
+<td>30 分钟</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>六、SEO 规范</h2>
+<h3>6.1 预渲染要求</h3>
+<ul>
+<li>每篇文章、分类、标签页生成<strong>独立静态 HTML 文件</strong></li>
+<li>静态 HTML 包含<strong>完整正文内容</strong>（Markdown 已渲染为 HTML）</li>
+<li>静态 HTML 包含<strong>完整导航结构</strong>（Header + Footer）</li>
+<li>无需等待 JS 执行，搜索引擎即可抓取全部内容</li>
+</ul>
+<h3>6.2 Meta 标签要求（每页预注入）</h3>
+<table>
+<thead>
+<tr>
+<th>标签</th>
+<th>必填</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>&lt;title&gt;</code></td>
+<td>✅</td>
+<td><code>页面标题 | Chunking</code></td>
+</tr>
+<tr>
+<td><code>&lt;meta name=&quot;description&quot;&gt;</code></td>
+<td>✅</td>
+<td>文章摘要，160 字符以内</td>
+</tr>
+<tr>
+<td><code>&lt;meta property=&quot;og:title&quot;&gt;</code></td>
+<td>✅</td>
+<td>页面标题</td>
+</tr>
+<tr>
+<td><code>&lt;meta property=&quot;og:description&quot;&gt;</code></td>
+<td>✅</td>
+<td>文章摘要</td>
+</tr>
+<tr>
+<td><code>&lt;meta property=&quot;og:type&quot;&gt;</code></td>
+<td>✅</td>
+<td><code>website</code> 或 <code>article</code></td>
+</tr>
+<tr>
+<td><code>&lt;meta property=&quot;og:url&quot;&gt;</code></td>
+<td>✅</td>
+<td>完整 URL</td>
+</tr>
+<tr>
+<td><code>&lt;meta property=&quot;og:image&quot;&gt;</code></td>
+<td>❌</td>
+<td>文章首图或默认图</td>
+</tr>
+<tr>
+<td><code>&lt;meta name=&quot;twitter:card&quot;&gt;</code></td>
+<td>✅</td>
+<td><code>summary_large_image</code></td>
+</tr>
+</tbody></table>
+<h3>6.3 站点地图</h3>
+<ul>
+<li>构建时自动生成 <code>sitemap.xml</code></li>
+<li>包含所有页面 URL 及优先级</li>
+<li>分类页、标签页、文章详情页全部纳入</li>
+</ul>
+<hr>
+<h2>七、Giscus 集成规范</h2>
+<table>
+<thead>
+<tr>
+<th>属性</th>
+<th>值</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>data-mapping</code></td>
+<td><code>specific</code></td>
+<td>通过指定 Discussion number 绑定</td>
+</tr>
+<tr>
+<td><code>data-term</code></td>
+<td><code>{post.number}</code></td>
+<td>博客文章 Discussion 的 number</td>
+</tr>
+<tr>
+<td><code>data-category</code></td>
+<td><code>Comments</code></td>
+<td>Giscus 专用评论分类</td>
+</tr>
+<tr>
+<td><code>data-category-id</code></td>
+<td>环境变量</td>
+<td>Giscus 分类 ID</td>
+</tr>
+<tr>
+<td><code>data-reactions-enabled</code></td>
+<td><code>1</code></td>
+<td>启用表情反应</td>
+</tr>
+<tr>
+<td><code>data-emit-metadata</code></td>
+<td><code>0</code></td>
+<td>不发送元数据</td>
+</tr>
+<tr>
+<td><code>data-input-position</code></td>
+<td><code>bottom</code></td>
+<td>评论框在底部</td>
+</tr>
+<tr>
+<td><code>data-theme</code></td>
+<td><code>preferred_color_scheme</code></td>
+<td>跟随系统主题</td>
+</tr>
+<tr>
+<td><code>data-lang</code></td>
+<td><code>zh-CN</code></td>
+<td>中文界面</td>
+</tr>
+</tbody></table>
+<p><strong>关联规则</strong>：博客文章 Discussion 与 Giscus 评论 Discussion 为<strong>同一个 Discussion</strong>，通过 <code>specific</code> 映射模式绑定。</p>
+<hr>
+<h2>八、文件结构规范</h2>
+<pre><code class="hljs language-plaintext">chunking-blog<span class="hljs-symbol">/</span>
+├── package.json              <span class="hljs-comment"># 项目依赖配置（name, version, scripts, dependencies, devDependencies）</span>
+├── package-lock.json         <span class="hljs-comment"># 依赖版本锁定文件</span>
+├── index.html                <span class="hljs-comment"># SPA 入口 HTML 模板（运行时）</span>
+├── vite.config.js            <span class="hljs-comment"># Vite 构建配置 + SSG 插件入口</span>
+├── build-ssg.js              <span class="hljs-comment"># 构建时 SSG 脚本（构建时执行）</span>
+├── .env                      <span class="hljs-comment"># 环境变量（不提交到版本控制）</span>
+├── .gitignore                <span class="hljs-comment"># Git 忽略规则（node_modules, dist, .env 等）</span>
+├── .github<span class="hljs-symbol">/</span>
+│   └── workflows<span class="hljs-symbol">/</span>
+│       └── deploy.yml        <span class="hljs-comment"># GitHub Actions CI 自动构建部署配置</span>
+├── public<span class="hljs-symbol">/</span>
+│   └── robots.txt            <span class="hljs-comment"># 搜索引擎爬虫规则</span>
+├── src<span class="hljs-symbol">/</span>
+│   ├── main.js               <span class="hljs-comment"># 应用入口：Hydration 初始化、路由注册</span>
+│   ├── router.js             <span class="hljs-comment"># SPA Router 核心实现（History API、动态路由、404）</span>
+│   ├── api<span class="hljs-symbol">/</span>
+│   │   ├── github.js         <span class="hljs-comment"># GitHub API 封装（Octokit + 缓存集成）</span>
+│   │   └── cache.js          <span class="hljs-comment"># 精简单层 localStorage 缓存（~80 行）</span>
+│   ├── components<span class="hljs-symbol">/</span>
+│   │   ├── Layout.js         <span class="hljs-comment"># 根布局组件（Header + Main + Footer）</span>
+│   │   ├── Header.js         <span class="hljs-comment"># 导航栏组件（Logo + 导航链接）</span>
+│   │   ├── Footer.js         <span class="hljs-comment"># 页脚组件</span>
+│   │   ├── PostCard.js       <span class="hljs-comment"># 文章卡片组件</span>
+│   │   ├── Breadcrumb.js     <span class="hljs-comment"># 面包屑导航组件</span>
+│   │   ├── Pagination.js     <span class="hljs-comment"># 分页组件</span>
+│   │   └── Giscus.js         <span class="hljs-comment"># Giscus 评论封装组件</span>
+│   ├── pages<span class="hljs-symbol">/</span>
+│   │   ├── Home.js           <span class="hljs-comment"># 首页：文章列表 + 分页</span>
+│   │   ├── Categories.js     <span class="hljs-comment"># 分类列表页：分类卡片网格</span>
+│   │   ├── CategoryDetail.js <span class="hljs-comment"># 分类详情页：面包屑 + 统计 + 文章列表</span>
+│   │   ├── Tags.js           <span class="hljs-comment"># 标签列表页：标签云</span>
+│   │   ├── TagDetail.js      <span class="hljs-comment"># 标签详情页：面包屑 + 统计 + 文章列表</span>
+│   │   ├── About.js          <span class="hljs-comment"># 关于页：博客简介</span>
+│   │   └── PostDetail.js     <span class="hljs-comment"># 文章详情页：面包屑 + 内容 + Giscus 评论</span>
+│   ├── utils<span class="hljs-symbol">/</span>
+│   │   ├── markdown.js       <span class="hljs-comment"># Marked.js + highlight.js 配置与渲染</span>
+│   │   ├── seo.js            <span class="hljs-comment"># 运行时 meta 标签动态注入工具（备用）</span>
+│   │   └── helpers.js        <span class="hljs-comment"># 通用工具函数（日期格式化、摘要提取、slugify 等）</span>
+│   └── styles<span class="hljs-symbol">/</span>
+│       ├── variables.css     <span class="hljs-comment"># CSS 变量：颜色、间距、字体、断点</span>
+│       ├── base.css          <span class="hljs-comment"># CSS 重置与基础样式</span>
+│       ├── layout.css        <span class="hljs-comment"># 布局相关样式（Header、Footer、容器）</span>
+│       ├── components.css    <span class="hljs-comment"># 组件样式（PostCard、Breadcrumb、Pagination 等）</span>
+│       └── pages.css         <span class="hljs-comment"># 页面特定样式</span>
+└── dist<span class="hljs-symbol">/</span>                     <span class="hljs-comment"># 构建输出目录（由 Vite 生成，含 SSG 预渲染结果）</span>
+    ├── index.html
+    ├── categories.html
+    ├── categories<span class="hljs-symbol">/</span>
+    │   ├── astro.html
+    │   └── css.html
+    ├── tags.html
+    ├── tags<span class="hljs-symbol">/</span>
+    │   ├── tailwind.html
+    │   └── vite.html
+    ├── posts<span class="hljs-symbol">/</span>
+    │   ├── <span class="hljs-number">1</span>.html
+    │   ├── <span class="hljs-number">2</span>.html
+    │   └── ...
+    ├── about.html
+    └── sitemap.xml</code></pre><hr>
+<h2>九、开发约束清单</h2>
+<ol>
+<li><strong>零前端框架</strong>：不使用 React/Vue/Angular/Svelte</li>
+<li><strong>原生 DOM 操作</strong>：<code>document.createElement</code>、事件委托；<code>innerHTML</code> 仅用于 Markdown 渲染结果</li>
+<li><strong>CSS 模块化</strong>：BEM 命名规范，不使用 CSS-in-JS</li>
+<li><strong>组件化</strong>：每个 <code>.js</code> 文件导出 <code>render(props)</code> 函数，返回 DOM 元素</li>
+<li><strong>路由守卫</strong>：页面切换滚动到顶部，更新 <code>document.title</code></li>
+<li><strong>错误处理</strong>：API 失败展示友好错误页，提供重试按钮</li>
+<li><strong>加载状态</strong>：数据获取展示骨架屏或 loading spinner</li>
+<li><strong>响应式</strong>：支持移动端、平板、桌面三档断点</li>
+</ol>
+<hr>
+<h2>十、关键环境变量</h2>
+<table>
+<thead>
+<tr>
+<th>变量名</th>
+<th>必填</th>
+<th>说明</th>
+<th>示例</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>VITE_GITHUB_OWNER</code></td>
+<td>✅</td>
+<td>GitHub 用户名/组织名</td>
+<td><code>yourname</code></td>
+</tr>
+<tr>
+<td><code>VITE_GITHUB_REPO</code></td>
+<td>✅</td>
+<td>存放 Discussions 的仓库名</td>
+<td><code>blog</code></td>
+</tr>
+<tr>
+<td><code>VITE_GITHUB_TOKEN</code></td>
+<td>✅</td>
+<td>GitHub Personal Access Token（构建时使用）</td>
+<td><code>ghp_xxxxxxxx</code></td>
+</tr>
+<tr>
+<td><code>VITE_GISCUS_REPO_ID</code></td>
+<td>✅</td>
+<td>Giscus 仓库 ID</td>
+<td>从 giscus.app 获取</td>
+</tr>
+<tr>
+<td><code>VITE_GISCUS_CATEGORY_ID</code></td>
+<td>✅</td>
+<td>Giscus 分类 ID</td>
+<td>从 giscus.app 获取</td>
+</tr>
+<tr>
+<td><code>VITE_BLOG_TITLE</code></td>
+<td>❌</td>
+<td>博客标题</td>
+<td><code>Chunking</code></td>
+</tr>
+<tr>
+<td><code>VITE_BLOG_DESCRIPTION</code></td>
+<td>❌</td>
+<td>博客描述</td>
+<td><code>A blog powered by GitHub Discussions</code></td>
+</tr>
+</tbody></table>
+<hr>
+<h2>十一、部署规范</h2>
+<table>
+<thead>
+<tr>
+<th>项目</th>
+<th>配置</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>平台</strong></td>
+<td>GitHub Pages（推荐，与内容仓库同源）</td>
+</tr>
+<tr>
+<td><strong>触发方式</strong></td>
+<td>Push 到 main 分支 或 定时触发（每 6 小时）</td>
+</tr>
+<tr>
+<td><strong>构建命令</strong></td>
+<td><code>npm run build</code></td>
+</tr>
+<tr>
+<td><strong>输出目录</strong></td>
+<td><code>dist/</code></td>
+</tr>
+<tr>
+<td><strong>定时重建</strong></td>
+<td>通过 GitHub Actions <code>schedule</code> 事件，同步新发布的 Discussion</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>十二、SEO 验收标准</h2>
+<table>
+<thead>
+<tr>
+<th>检查项</th>
+<th>要求</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Google 索引</td>
+<td>所有页面可被正常抓取和索引</td>
+</tr>
+<tr>
+<td>百度索引</td>
+<td>所有页面可被正常抓取和索引</td>
+</tr>
+<tr>
+<td>社交分享</td>
+<td>Twitter/Facebook/微信 抓取显示正确标题、描述、图片</td>
+</tr>
+<tr>
+<td>站点地图</td>
+<td><code>sitemap.xml</code> 包含全部 URL，可被搜索引擎读取</td>
+</tr>
+<tr>
+<td>无 JS 依赖</td>
+<td>禁用 JavaScript 后，页面内容完整可读</td>
+</tr>
+</tbody></table>
+<hr>
+<p>以上为修正后的完整 <strong>最新需求文档 v1.3</strong>。主要修正：</p>
+<ol>
+<li>✅ 补充 <code>package.json</code> 到文件结构规范</li>
+<li>✅ 补充 <code>package-lock.json</code> 到文件结构规范</li>
+<li>✅ 补充 <code>.gitignore</code> 到文件结构规范</li>
+<li>✅ 为每个文件增加详细注释说明其用途</li>
+</ol>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="1"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>

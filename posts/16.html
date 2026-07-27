@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>github pages页面问题修复记录 | Chunking</title>
+  <meta name="description" content="1. GitHub Pages 主页样式缺失  问题概括：   GitHub Pages 部署成功后，博客主页 CSS/JS 资源全部 404，页面无样式。  问题类别：   路径引用  影响范围：   GitHub Pages 生产环境的主页（https://stuffren.github.io/c...">
+  <meta property="og:title" content="github pages页面问题修复记录">
+  <meta property="og:description" content="1. GitHub Pages 主页样式缺失  问题概括：   GitHub Pages 部署成功后，博客主页 CSS/JS 资源全部 404，页面无样式。  问题类别：   路径引用  影响范围：   GitHub Pages 生产环境的主页（https://stuffren.github.io/c...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/16">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>github pages页面问题修复记录</span>
+      </nav>
+      <header class="post-header">
+        <h1>github pages页面问题修复记录</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-25T14:35:36Z">2026年7月25日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/bug" class="tag">bug</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <h3>1. GitHub Pages 主页样式缺失</h3>
+<p><strong>问题概括：</strong><br>GitHub Pages 部署成功后，博客主页 CSS/JS 资源全部 404，页面无样式。</p>
+<p><strong>问题类别：</strong><br>路径引用</p>
+<p><strong>影响范围：</strong><br>GitHub Pages 生产环境的主页（<code>https://stuffren.github.io/chunking-blog/</code>）及所有依赖静态资源的页面。</p>
+<p><strong>问题原因：</strong>  </p>
+<ul>
+<li><strong>技术根因：</strong> 项目缺少 <code>base</code> 路径配置。Vite 构建时默认以 <code>/</code> 为根路径生成 assets 引用（如 <code>/assets/main.js</code>），但 GitHub Pages 仓库子路径部署的实际根目录是 <code>/chunking-blog/</code>，导致浏览器去错误的绝对路径请求资源。</li>
+<li><strong>人话解释：</strong> 你住在一个大院子的某间屋子里，但快递单上只写了&quot;院子门口&quot;，没写&quot;哪间屋子&quot;。快递员把包裹扔在大门就走了，你当然收不到。</li>
+</ul>
+<p><strong>排查思路：</strong>  </p>
+<ol>
+<li>用户查看主页源码，发现返回的是原始 <code>index.html</code> 模板（引用 <code>/src/styles/...</code> 和 <code>/src/main.js</code>），而非 SSG 预渲染后的完整 HTML。  </li>
+<li>推断 SSG 生成的 HTML 中 assets 路径也是错误的（缺少 <code>/chunking-blog/</code> 前缀），浏览器加载 JS 失败后无法执行 Hydration，页面保持为服务器返回的原始 HTML。  </li>
+<li>结合 GitHub Pages 子路径部署特性，锁定根因：所有绝对路径都指向了根域名，而非子路径。</li>
+</ol>
+<p><strong>最佳解决方法：</strong><br>采用<strong>环境变量控制 base path</strong>的方案，实现本地零影响、生产自动适配：  </p>
+<ul>
+<li><code>vite.config.js</code>：生产构建时读取 <code>process.env.BASE_PATH</code>，本地开发默认 <code>/</code>。  </li>
+<li><code>deploy.yml</code>：CI 构建步骤注入 <code>BASE_PATH: /chunking-blog/</code>。  </li>
+<li><code>build-ssg.js</code>：所有内部导航链接自动拼上 <code>BASE_PATH</code> 前缀。  </li>
+<li><code>router.js</code>：运行时通过 <code>import.meta.env.BASE_URL</code> 识别 base path，导航时自动补全前缀，路由匹配时自动剥离前缀。</li>
+</ul>
+<p><strong>验证状态：</strong><br>用户已确认 —— &quot;现在打开博客地址，一切正常，问题得到完美解决。&quot;</p>
+<hr>
+<h3>2. GitHub Pages 文章详情页 404</h3>
+<p><strong>问题概括：</strong><br>点击文章进入详情页后，浏览器地址栏显示 <code>/posts/1</code> 并返回 404，缺少仓库子路径前缀。</p>
+<p><strong>问题类别：</strong><br>路径引用</p>
+<p><strong>影响范围：</strong><br>GitHub Pages 生产环境的所有文章详情页（如 <code>/posts/1</code>）、分类页、标签页等内部链接跳转。</p>
+<p><strong>问题原因：</strong>  </p>
+<ul>
+<li><strong>技术根因：</strong> <code>build-ssg.js</code> 中生成的内部链接使用硬编码绝对路径（如 <code>/posts/${post.number}</code>），在根域名部署下正确，但在 GitHub Pages 子路径部署（<code>/chunking-blog/</code>）下，浏览器将其解析为 <code>https://stuffren.github.io/posts/1</code>，实际应为 <code>https://stuffren.github.io/chunking-blog/posts/1</code>。同时 <code>router.js</code> 也未处理子路径 basename，导致 SPA 运行时路由匹配失败。</li>
+<li><strong>人话解释：</strong> 你给朋友发的邀请函上写的聚会地址是&quot;院子大门&quot;，朋友到了院子找不到你的屋子，只能空手而归。</li>
+</ul>
+<p><strong>排查思路：</strong>  </p>
+<ol>
+<li>用户发现详情页 URL 为 <code>/posts/1</code>，而仓库地址是 <code>/chunking-blog</code>，路径中缺失了仓库子路径。  </li>
+<li>检查 <code>build-ssg.js</code> 发现内部链接全部基于 <code>/</code> 硬编码。  </li>
+<li>检查 <code>router.js</code> 发现路由匹配逻辑直接对 <code>location.pathname</code> 进行正则匹配，未考虑子路径前缀需要剥离。  </li>
+<li>综合判断：这是与&quot;样式缺失&quot;同源的问题——项目整体缺少对子路径部署的 base path 适配。</li>
+</ol>
+<p><strong>最佳解决方法：</strong><br>与问题 1 共用同一套环境变量方案，形成完整闭环：  </p>
+<ul>
+<li><code>build-ssg.js</code>：定义 <code>BASE_PATH</code> 常量，所有 <code>&lt;a href=&quot;...&quot;&gt;</code> 链接统一改为 <code>${BASE_PATH}/posts/...</code>、<code>${BASE_PATH}/categories/...</code> 等模板字符串拼接。  </li>
+<li><code>router.js</code>：  <ul>
+<li><code>navigate()</code> 方法中，若用户点击的 <code>href</code> 是绝对路径且未包含 <code>BASE_PREFIX</code>，自动补全前缀（如 <code>/posts/1</code> → <code>/chunking-blog/posts/1</code>）。  </li>
+<li><code>resolve()</code> 方法中，若当前 URL 以 <code>BASE_PREFIX</code> 开头，先剥离前缀再进行路由正则匹配（如 <code>/chunking-blog/posts/1</code> → 匹配 <code>/posts/1</code>）。</li>
+</ul>
+</li>
+</ul>
+<p><strong>验证状态：</strong><br>用户已确认 —— &quot;现在打开博客地址，一切正常，问题得到完美解决。&quot;</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="16"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>
