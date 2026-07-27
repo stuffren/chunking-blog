@@ -46,6 +46,11 @@ jobs:
           VITE_GISCUS_REPO_ID: ${{ secrets.GISCUS_REPO_ID }}
           VITE_GISCUS_CATEGORY_ID: ${{ secrets.GISCUS_CATEGORY_ID }}
 
+      # 6. 创建 CNAME 文件（保留自定义域名配置）
+      - name: Create CNAME file
+        run: echo "envjs.fun" > ./dist/CNAME
+
+
       # 6. 部署到 GitHub Pages（自定义域名）
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
