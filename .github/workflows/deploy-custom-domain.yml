@@ -8,6 +8,7 @@ on:
   # 支持手动触发
   workflow_dispatch:
 
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -51,7 +52,7 @@ jobs:
         run: echo "envjs.fun" > ./dist/CNAME
 
 
-      # 6. 部署到 GitHub Pages（自定义域名）
+      # 7. 部署到 GitHub Pages（自定义域名）
       - name: Deploy to GitHub Pages
         uses: peaceiris/actions-gh-pages@v4
         with:
