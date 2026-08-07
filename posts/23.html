@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自定义域名之10-github pages成为重定向入口后是否有必要保持4种环境的BASE_PATH的隔离思路？ | Chunking</title>
+  <meta name="description" content="问题13：之前保持了《将本地开发环境，预览生产环境，GitHub Pages环境的根URL完美隔离的解决方案.md》和之后新增的 CI 工作流 deploy-custom-domain.yml。我当前在项目仓库的github pages里面配置了自定义域名envjs.fun，  现在可以成功通过自定义域名https:/...">
+  <meta property="og:title" content="自定义域名之10-github pages成为重定向入口后是否有必要保持4种环境的BASE_PATH的隔离思路？">
+  <meta property="og:description" content="问题13：之前保持了《将本地开发环境，预览生产环境，GitHub Pages环境的根URL完美隔离的解决方案.md》和之后新增的 CI 工作流 deploy-custom-domain.yml。我当前在项目仓库的github pages里面配置了自定义域名envjs.fun，  现在可以成功通过自定义域名https:/...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://envjs.fun/posts/23">
+  <meta property="og:image" content="https://envjs.fun/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/categories">Categories</a>
+            <a href="/tags">Tags</a>
+            <a href="/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/">Home</a>
+        <span class="sep">/</span>
+        <span>自定义域名之10-github pages成为重定向入口后是否有必要保持4种环境的BASE_PATH的隔离思路？</span>
+      </nav>
+      <header class="post-header">
+        <h1>自定义域名之10-github pages成为重定向入口后是否有必要保持4种环境的BASE_PATH的隔离思路？</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-28T14:24:15Z">2026年7月28日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/categories/blog" class="category-link">Blog</a>
+          <a href="/tags/github-pages-custom-domain" class="tag">github-pages-custom-domain</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>问题13：之前保持了<code>《将本地开发环境，预览生产环境，GitHub Pages环境的根URL完美隔离的解决方案.md》</code>和之后新增的 CI 工作流 <code>deploy-custom-domain.yml</code>。我当前在项目仓库的github pages里面配置了自定义域名envjs.fun，  现在可以成功通过<a href="https://envjs.fun/">自定义域名</a>访问博客。同时我发现当我访问原来的<a href="https://stuffren.github.io/chunking-blog/">github pages地址</a>时，它会自动跳转到自定义域名地址。<br>基于这种情况，是否可以或有必要依然同时保持这4种环境（本地开发，预览生产，github pages，自定义域名）的BASE_PATH的隔离思路？</p>
+<br>
+
+<hr>
+<p>这是一个很好的问题。让我分析一下当前情况：</p>
+<hr>
+<h2>当前状态分析</h2>
+<table>
+<thead>
+<tr>
+<th>环境</th>
+<th>访问地址</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>本地开发</td>
+<td><code>http://localhost:5173</code></td>
+<td>✅ 正常</td>
+</tr>
+<tr>
+<td>预览生产</td>
+<td><code>http://localhost:4173</code></td>
+<td>✅ 正常</td>
+</tr>
+<tr>
+<td>GitHub Pages</td>
+<td><code>https://stuffren.github.io/chunking-blog/</code></td>
+<td>⚠️ 自动跳转到 <code>envjs.fun</code></td>
+</tr>
+<tr>
+<td>自定义域名</td>
+<td><code>https://envjs.fun/</code></td>
+<td>✅ 正常</td>
+</tr>
+</tbody></table>
+<p><strong>关键发现</strong>：GitHub Pages 原地址已经自动跳转到自定义域名，说明 GitHub 的自定义域名配置已经生效，并且启用了域名重定向。</p>
+<hr>
+<h2>是否还有必要保持 4 环境隔离？</h2>
+<h3>答案：<strong>有必要，但可以简化</strong></h3>
+<p>原因如下：</p>
+<h3>1. 本地开发和预览生产环境仍然需要隔离</h3>
+<table>
+<thead>
+<tr>
+<th>环境</th>
+<th>为什么需要独立 BASE_PATH</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>本地开发</strong> (<code>npm run dev</code>)</td>
+<td>Vite 开发服务器运行在根路径，需要 <code>/</code></td>
+</tr>
+<tr>
+<td><strong>预览生产</strong> (<code>npm run preview</code>)</td>
+<td>Vite 预览服务器运行在根路径，需要 <code>/</code></td>
+</tr>
+<tr>
+<td><strong>GitHub Pages</strong></td>
+<td>现在已跳转到自定义域名，实际上不再独立提供服务</td>
+</tr>
+<tr>
+<td><strong>自定义域名</strong></td>
+<td>根域名部署，需要 <code>/</code></td>
+</tr>
+</tbody></table>
+<h3>2. GitHub Pages 环境实际上已&quot;失效&quot;</h3>
+<p>由于 <code>stuffren.github.io/chunking-blog/</code> 自动跳转到 <code>envjs.fun</code>，这意味着：</p>
+<ul>
+<li>用户实际上<strong>无法直接访问</strong>带 <code>/chunking-blog/</code> 前缀的地址</li>
+<li>GitHub Pages 只是作为<strong>重定向入口</strong>，最终都到了自定义域名</li>
+</ul>
+<hr>
+<h2>建议的调整方案</h2>
+<h3>方案 A：保持现状（推荐）</h3>
+<p>保留现有的 4 环境隔离架构，但理解其实际运行方式：</p>
+<pre><code class="hljs language-plaintext">本地开发 (/) ──┐
+预览生产 (/) ──┼──► 实际只有 <span class="hljs-number">2</span> 种产物
+GitHub Pages (/chunking-blog/) ──► 自动跳转 ──► 自定义域名 (/)
+自定义域名 (/) ──┘</code></pre><p><strong>优点</strong>：</p>
+<ul>
+<li>如果将来自定义域名出问题，可以快速切回 GitHub Pages</li>
+<li>代码架构无需改动</li>
+<li>符合《方案》的零代码改动哲学</li>
+</ul>
+<h3>方案 B：简化架构（可选）</h3>
+<p>如果确定长期只使用自定义域名，可以简化：</p>
+<table>
+<thead>
+<tr>
+<th>调整项</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>deploy.yml</code></td>
+<td>删除 <code>BASE_PATH: /chunking-blog/</code>，统一使用 <code>/</code></td>
+</tr>
+<tr>
+<td>工作流数量</td>
+<td>合并为一个，只保留 <code>main</code> 分支触发</td>
+</tr>
+<tr>
+<td><code>custom-domain</code> 分支</td>
+<td>可以删除，不再维护</td>
+</tr>
+</tbody></table>
+<p><strong>优点</strong>：配置更简单，只有一个部署流程</p>
+<p><strong>缺点</strong>：失去回退能力，如果域名出问题无法快速恢复</p>
+<hr>
+<h2>我的建议</h2>
+<h3>保持现有架构，理由如下：</h3>
+<table>
+<thead>
+<tr>
+<th>考量因素</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>风险兜底</strong></td>
+<td>自定义域名可能因续费、DNS、备案等问题失效，GitHub Pages 地址是最后的保障</td>
+</tr>
+<tr>
+<td><strong>零代码改动</strong></td>
+<td>现有架构已经完美运行，无需调整</td>
+</tr>
+<tr>
+<td><strong>未来扩展</strong></td>
+<td>如果将来需要部署到其他平台（如 Vercel、Netlify），现有架构更容易扩展</td>
+</tr>
+<tr>
+<td><strong>心智负担</strong></td>
+<td>保持 4 环境隔离虽然多一个分支，但逻辑清晰，维护成本很低</td>
+</tr>
+</tbody></table>
+<h3>实际运行时的理解</h3>
+<table>
+<thead>
+<tr>
+<th>工作流</th>
+<th>触发分支</th>
+<th>产物 BASE_PATH</th>
+<th>实际用户访问</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>deploy.yml</code></td>
+<td><code>main</code></td>
+<td><code>/chunking-blog/</code></td>
+<td>自动跳转到 <code>envjs.fun</code></td>
+</tr>
+<tr>
+<td><code>deploy-custom-domain.yml</code></td>
+<td><code>custom-domain</code></td>
+<td><code>/</code></td>
+<td>直接访问 <code>envjs.fun</code></td>
+</tr>
+</tbody></table>
+<p>虽然 <code>deploy.yml</code> 的产物带前缀，但用户被重定向后，最终看到的都是根路径版本。</p>
+<hr>
+<h2>结论</h2>
+<blockquote>
+<p><strong>有必要保持隔离思路，但可以理解为&quot;3+1&quot;模式：</strong></p>
+<ul>
+<li>3 个开发/部署环境（本地、预览、自定义域名）使用 <code>/</code></li>
+<li>1 个兜底环境（GitHub Pages）使用 <code>/chunking-blog/</code>，实际作为重定向入口</li>
+</ul>
+</blockquote>
+<p>这样既保留了风险兜底能力，又不影响用户体验。</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="23"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/assets/main-BHkJEbAP.js"></script>
+</body>
+</html>
