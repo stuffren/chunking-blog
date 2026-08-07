@@ -30,7 +30,7 @@ const OWNER = process.env.VITE_GITHUB_OWNER;
 const REPO = process.env.VITE_GITHUB_REPO;
 
 // 修改：从环境变量读取 BASE_URL,默认使用 GitHub Pages 地址
-const BASE_URL = process.env.VITE_BASE_URL || `https://${OWNER}.github.io/${REPO}`;
+const BASE_URL = process.env.VITE_BASE_URL || `http://localhost:5173`;
 
 // HTML 模板
 // 修改：pageTemplate 函数新增 assets 参数,用于接收 Vite 构建后的 assets 路径
