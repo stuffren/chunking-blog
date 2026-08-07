@@ -32,6 +32,7 @@ const REPO = process.env.VITE_GITHUB_REPO;
 // 修改：从环境变量读取 BASE_URL,默认使用 GitHub Pages 地址
 const BASE_URL = process.env.VITE_BASE_URL || `http://localhost:5173`;
 
+
 // HTML 模板
 // 修改：pageTemplate 函数新增 assets 参数,用于接收 Vite 构建后的 assets 路径
 function pageTemplate({ title, description, body, type = 'website', url, image, assets }) {
@@ -48,6 +49,8 @@ function pageTemplate({ title, description, body, type = 'website', url, image, 
   <meta property="og:url" content="${url}">
   <meta property="og:image" content="${image || BASE_URL + '/og-default.png'}">
   <meta name="twitter:card" content="summary_large_image">
+  <!-- SEO 优化：添加 canonical 标签，声明当前页面为权威来源，避免与 GitHub Discussions 内容同质化 -->
+  <link rel="canonical" href="${url}">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
   <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
   <link rel="stylesheet" crossorigin href="${assets.css}">
@@ -214,6 +217,9 @@ export async function generateSSG() {
 
   // 8. 生成 sitemap.xml
   await generateSitemap(posts, categories, labels);
+
+  // SEO 优化：生成 robots.txt，确保 sitemap URL 与 BASE_URL 一致
+  await generateRobotsTxt();
 
   console.log(`✅ SSG complete: ${posts.length} posts, ${categories.length} categories, ${labels.length} tags`);
 }
@@ -444,6 +450,16 @@ ${urls.map(u => `  <url>
 </urlset>`;
 
   await writeFile(join(DIST_DIR, 'sitemap.xml'), xml);
+}
+
+// SEO 优化：自动生成 robots.txt，确保 sitemap URL 与 BASE_URL 环境变量保持一致
+async function generateRobotsTxt() {
+  const robotsContent = `User-agent: *
+Allow: /
+Sitemap: ${BASE_URL}/sitemap.xml`;
+  
+  await writeFile(join(DIST_DIR, 'robots.txt'), robotsContent);
+  console.log('✅ robots.txt generated');
 }
 
 function extractExcerpt(body, maxLength = 160) {

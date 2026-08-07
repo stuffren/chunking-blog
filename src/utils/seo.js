@@ -26,4 +26,13 @@ export function setPageMeta({ title, description, type = 'website', url, image }
     }
     el.setAttribute('content', meta.content);
   });
+
+  // SEO 优化：动态更新 canonical 标签，避免 SPA 路由切换时内容同质化
+  let canonicalLink = document.querySelector('link[rel="canonical"]');
+  if (!canonicalLink) {
+    canonicalLink = document.createElement('link');
+    canonicalLink.setAttribute('rel', 'canonical');
+    document.head.appendChild(canonicalLink);
+  }
+  canonicalLink.setAttribute('href', url || location.href);
 }
