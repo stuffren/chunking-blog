@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自定义域名之4-环境变量驱动的架构 | Chunking</title>
+  <meta name="description" content="好的，我已经将该文件《将本地开发环境，预览生产环境，GitHub Pages环境的根URL完美隔离的解决方案.md》（以下简称《方案》），复制到了当前项目目录下，请你读取它。   然后，重新回答刚才的问题     问题1：这个方案的最后提到：将来换域名/路径， 只改 CI 环境变量，零代码改动。而你刚才提到如果我...">
+  <meta property="og:title" content="自定义域名之4-环境变量驱动的架构">
+  <meta property="og:description" content="好的，我已经将该文件《将本地开发环境，预览生产环境，GitHub Pages环境的根URL完美隔离的解决方案.md》（以下简称《方案》），复制到了当前项目目录下，请你读取它。   然后，重新回答刚才的问题     问题1：这个方案的最后提到：将来换域名/路径， 只改 CI 环境变量，零代码改动。而你刚才提到如果我...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/17">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>自定义域名之4-环境变量驱动的架构</span>
+      </nav>
+      <header class="post-header">
+        <h1>自定义域名之4-环境变量驱动的架构</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-28T13:35:58Z">2026年7月28日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/github-pages-custom-domain" class="tag">github-pages-custom-domain</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>好的，我已经将该文件<code>《将本地开发环境，预览生产环境，GitHub Pages环境的根URL完美隔离的解决方案.md》</code>（以下简称《方案》），复制到了当前项目目录下，请你读取它。 </p>
+<p>然后，重新回答刚才的问题<br>问题1：这个方案的最后提到：<code>将来换域名/路径， 只改 CI 环境变量，零代码改动</code>。而你刚才提到如果我决定配置自定义域名，需要修改 vite.config.js 和 build-ssg.js 中的路径配置，这两者是否是一回事？<br>问题2：如果我决定配置自定义域名，需要修改 <code>vite.config.js</code> 和 <code>build-ssg.js</code> 中的路径配置，可否依然采用《方案》里的解决思路：即本地开发环境，预览生产环境，GitHub Pages环境，域名，各自保持自己独立的<code>base url</code>？ </p>
+<hr>
+<h2>问题1：两者是否一回事？</h2>
+<p><strong>不是一回事，而且我之前的表述有误。</strong></p>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>《方案》的思路</th>
+<th>我之前的建议</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>核心机制</strong></td>
+<td>通过 <code>process.env.BASE_PATH</code> 环境变量，<strong>构建时</strong>动态决定 base path</td>
+<td>手动修改代码中的硬编码值</td>
+</tr>
+<tr>
+<td><strong>本地开发</strong></td>
+<td><code>npm run dev</code> 不设 <code>BASE_PATH</code>，默认 <code>/</code>，完全正常</td>
+<td>需要手动调整</td>
+</tr>
+<tr>
+<td><strong>预览生产</strong></td>
+<td><code>npm run preview</code> 也不设 <code>BASE_PATH</code>，默认 <code>/</code>，直接访问 <code>localhost:4173/</code></td>
+<td>需要手动调整</td>
+</tr>
+<tr>
+<td><strong>GitHub Pages</strong></td>
+<td>CI 构建时注入 <code>BASE_PATH=/chunking-blog/</code>，产物自动带前缀</td>
+<td>需要手动调整</td>
+</tr>
+<tr>
+<td><strong>将来变更</strong></td>
+<td><strong>只改 CI 环境变量，零代码改动</strong></td>
+<td>需要改代码</td>
+</tr>
+</tbody></table>
+<p><strong>关键区别</strong>：《方案》已经实现了<strong>环境变量驱动</strong>的架构，代码层面完全不需要改动。我之前说&quot;需要修改 vite.config.js 和 build-ssg.js&quot;是错误的——这两个文件<strong>已经</strong>采用了环境变量机制，不需要再修改。</p>
+<hr>
+<h2>问题2：配置自定义域名后，是否可以继续采用《方案》的隔离思路？</h2>
+<p><strong>完全可以，而且这是最佳实践！</strong></p>
+<p>《方案》当前覆盖了 3 个环境：</p>
+<table>
+<thead>
+<tr>
+<th>环境</th>
+<th>触发条件</th>
+<th>BASE_PATH</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>本地开发</td>
+<td><code>npm run dev</code></td>
+<td><code>/</code>（默认）</td>
+</tr>
+<tr>
+<td>预览生产</td>
+<td><code>npm run preview</code></td>
+<td><code>/</code>（默认）</td>
+</tr>
+<tr>
+<td>GitHub Pages</td>
+<td>CI 构建注入</td>
+<td><code>/chunking-blog/</code></td>
+</tr>
+</tbody></table>
+<p>配置自定义域名后，可以<strong>扩展为第 4 个环境</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>新增环境</th>
+<th>触发条件</th>
+<th>BASE_PATH</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>自定义域名</strong></td>
+<td>新的 CI 工作流或部署脚本</td>
+<td><code>/</code>（根路径）</td>
+</tr>
+</tbody></table>
+<h3>具体实现思路</h3>
+<ol>
+<li><p><strong>保持现有代码不变</strong>：</p>
+<ul>
+<li><code>vite.config.js</code> 继续用 <code>base: process.env.BASE_PATH || &#39;/&#39;</code></li>
+<li><code>build-ssg.js</code> 继续从环境变量读取路径前缀</li>
+<li><code>router.js</code> 继续通过 <code>import.meta.env.BASE_URL</code> 自动识别</li>
+</ul>
+</li>
+<li><p><strong>新增部署配置</strong>：</p>
+<ul>
+<li>为自定义域名创建一个新的 CI 工作流（如 <code>deploy-custom-domain.yml</code>）</li>
+<li>该工作流<strong>不设置</strong> <code>BASE_PATH</code>（或显式设置为 <code>/</code>）</li>
+<li>构建产物将使用根路径，适合自定义域名部署</li>
+</ul>
+</li>
+<li><p><strong>环境隔离保持完整</strong>：</p>
+<ul>
+<li>本地开发：永远不受影响</li>
+<li>GitHub Pages：继续使用 <code>/chunking-blog/</code></li>
+<li>自定义域名：使用 <code>/</code></li>
+<li>将来再换域名/路径：依然只改 CI 环境变量</li>
+</ul>
+</li>
+</ol>
+<h3>一句话总结</h3>
+<p>《方案》的设计已经具备了<strong>完美的扩展性</strong>。配置自定义域名时，<strong>不需要修改任何代码</strong>，只需要：</p>
+<ul>
+<li>新增一个 CI 工作流（不注入 <code>BASE_PATH</code>）</li>
+<li>或者修改现有工作流的环境变量值</li>
+</ul>
+<p>代码层面完全保持现状，真正实现&quot;将来换域名/路径，只改 CI 环境变量，零代码改动&quot;。</p>
+<hr>
+<h2>修正后的结论</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>修正后的答案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>两者是否一回事？</td>
+<td><strong>不是一回事</strong>。我之前说错了，《方案》已经实现了环境变量驱动，不需要手动改代码</td>
+</tr>
+<tr>
+<td>能否继续采用《方案》思路？</td>
+<td><strong>完全可以</strong>。自定义域名作为第 4 个环境，通过新增/修改 CI 工作流实现，代码零改动</td>
+</tr>
+</tbody></table>
+<p>你的项目架构设计得很好，具备很强的扩展性！</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="17"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>

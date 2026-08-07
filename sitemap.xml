@@ -96,6 +96,41 @@
     <changefreq>weekly</changefreq>
   </url>
   <url>
+    <loc>https://stuffren.github.io/chunking-blog/posts/17</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://stuffren.github.io/chunking-blog/posts/18</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://stuffren.github.io/chunking-blog/posts/19</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://stuffren.github.io/chunking-blog/posts/20</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://stuffren.github.io/chunking-blog/posts/21</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://stuffren.github.io/chunking-blog/posts/22</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://stuffren.github.io/chunking-blog/posts/23</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
     <loc>https://stuffren.github.io/chunking-blog/categories/blog</loc>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
@@ -132,6 +167,11 @@
   </url>
   <url>
     <loc>https://stuffren.github.io/chunking-blog/tags/github_action</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://stuffren.github.io/chunking-blog/tags/github-pages-custom-domain</loc>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
   </url>

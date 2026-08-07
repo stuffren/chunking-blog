@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自定义域名之6-采用`新增 CI 工作流 deploy-custom-domain.yml`方式 | Chunking</title>
+  <meta name="description" content="好的，我决定采用方式A，请基于当前项目.github\workflows中的deploy.yml，新增一个CI 工作流 deploy-custom-domain.yml。   要求：   1.该工作流不设置 BASE_PATH（或显式设置为 /）   2.构建产物将使用根路径，适合自定义域名部署    ---...">
+  <meta property="og:title" content="自定义域名之6-采用`新增 CI 工作流 deploy-custom-domain.yml`方式">
+  <meta property="og:description" content="好的，我决定采用方式A，请基于当前项目.github\workflows中的deploy.yml，新增一个CI 工作流 deploy-custom-domain.yml。   要求：   1.该工作流不设置 BASE_PATH（或显式设置为 /）   2.构建产物将使用根路径，适合自定义域名部署    ---...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/19">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>自定义域名之6-采用`新增 CI 工作流 deploy-custom-domain.yml`方式</span>
+      </nav>
+      <header class="post-header">
+        <h1>自定义域名之6-采用`新增 CI 工作流 deploy-custom-domain.yml`方式</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-28T13:49:47Z">2026年7月28日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/github-pages-custom-domain" class="tag">github-pages-custom-domain</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>好的，我决定采用方式A，请基于当前项目.github\workflows中的deploy.yml，新增一个CI 工作流 deploy-custom-domain.yml。<br>要求：<br>1.该工作流不设置 BASE_PATH（或显式设置为 /）<br>2.构建产物将使用根路径，适合自定义域名部署  </p>
+<hr>
+<p>我已经查看了现有的 <code>deploy.yml</code> 文件。现在为你创建新的 <code>deploy-custom-domain.yml</code> 工作流。</p>
+<pre><code class="hljs language-yaml"><span class="hljs-attr">name:</span> <span class="hljs-string">Build</span> <span class="hljs-string">and</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">to</span> <span class="hljs-string">Custom</span> <span class="hljs-string">Domain</span>
+
+<span class="hljs-attr">on:</span>
+  <span class="hljs-comment"># 推送到 custom-domain 分支时触发</span>
+  <span class="hljs-attr">push:</span>
+    <span class="hljs-attr">branches:</span> [<span class="hljs-string">custom-domain</span>]
+
+  <span class="hljs-comment"># 支持手动触发</span>
+  <span class="hljs-attr">workflow_dispatch:</span>
+
+<span class="hljs-attr">jobs:</span>
+  <span class="hljs-attr">build:</span>
+    <span class="hljs-attr">runs-on:</span> <span class="hljs-string">ubuntu-latest</span>
+
+    <span class="hljs-attr">steps:</span>
+      <span class="hljs-comment"># 1. 检出代码</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Checkout</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/checkout@v4</span>
+
+      <span class="hljs-comment"># 2. 设置 Node.js 环境</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Setup</span> <span class="hljs-string">Node.js</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">actions/setup-node@v4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">node-version:</span> <span class="hljs-string">&#x27;22&#x27;</span>
+          <span class="hljs-attr">cache:</span> <span class="hljs-string">&#x27;npm&#x27;</span>
+
+      <span class="hljs-comment"># 3. 安装依赖</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Install</span> <span class="hljs-string">dependencies</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">ci</span>
+
+      <span class="hljs-comment"># 4. 动态创建 .env 文件</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Create</span> <span class="hljs-string">.env</span> <span class="hljs-string">file</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">|
+          echo &quot;VITE_GITHUB_OWNER=${{ secrets.GH_OWNER }}&quot; &gt; .env
+          echo &quot;VITE_GITHUB_REPO=${{ secrets.GH_REPO }}&quot; &gt;&gt; .env
+          echo &quot;VITE_GISCUS_REPO_ID=${{ secrets.GISCUS_REPO_ID }}&quot; &gt;&gt; .env
+          echo &quot;VITE_GISCUS_CATEGORY_ID=${{ secrets.GISCUS_CATEGORY_ID }}&quot; &gt;&gt; .env
+</span>
+      <span class="hljs-comment"># 5. 执行构建（不设置 BASE_PATH，使用根路径 /）</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Build</span>
+        <span class="hljs-attr">run:</span> <span class="hljs-string">npm</span> <span class="hljs-string">run</span> <span class="hljs-string">build</span>
+        <span class="hljs-attr">env:</span>
+          <span class="hljs-attr">GITHUB_TOKEN:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GH_TOKEN</span> <span class="hljs-string">}}</span>
+          <span class="hljs-attr">VITE_GITHUB_OWNER:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GH_OWNER</span> <span class="hljs-string">}}</span>
+          <span class="hljs-attr">VITE_GITHUB_REPO:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GH_REPO</span> <span class="hljs-string">}}</span>
+          <span class="hljs-attr">VITE_GISCUS_REPO_ID:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GISCUS_REPO_ID</span> <span class="hljs-string">}}</span>
+          <span class="hljs-attr">VITE_GISCUS_CATEGORY_ID:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GISCUS_CATEGORY_ID</span> <span class="hljs-string">}}</span>
+
+      <span class="hljs-comment"># 6. 部署到 GitHub Pages（自定义域名）</span>
+      <span class="hljs-bullet">-</span> <span class="hljs-attr">name:</span> <span class="hljs-string">Deploy</span> <span class="hljs-string">to</span> <span class="hljs-string">GitHub</span> <span class="hljs-string">Pages</span>
+        <span class="hljs-attr">uses:</span> <span class="hljs-string">peaceiris/actions-gh-pages@v4</span>
+        <span class="hljs-attr">with:</span>
+          <span class="hljs-attr">github_token:</span> <span class="hljs-string">${{</span> <span class="hljs-string">secrets.GH_TOKEN</span> <span class="hljs-string">}}</span>
+          <span class="hljs-attr">publish_dir:</span> <span class="hljs-string">./dist</span></code></pre><hr>
+<h2>两个工作流的关键差异对比</h2>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th><code>deploy.yml</code>（GitHub Pages）</th>
+<th><code>deploy-custom-domain.yml</code>（自定义域名）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>触发分支</strong></td>
+<td><code>main</code></td>
+<td><code>custom-domain</code></td>
+</tr>
+<tr>
+<td><strong>BASE_PATH</strong></td>
+<td><code>/chunking-blog/</code></td>
+<td>不设置（默认 <code>/</code>）</td>
+</tr>
+<tr>
+<td><strong>定时触发</strong></td>
+<td>每 6 小时</td>
+<td>无</td>
+</tr>
+<tr>
+<td><strong>部署目标</strong></td>
+<td><code>stuffren.github.io/chunking-blog/</code></td>
+<td>自定义域名（根路径）</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>使用方式</h2>
+<ol>
+<li><strong>创建文件</strong>：将上述内容保存到 <code>.github/workflows/deploy-custom-domain.yml</code></li>
+<li><strong>创建分支</strong>：在本地创建并推送 <code>custom-domain</code> 分支<pre><code class="hljs language-bash">git checkout -b custom-domain
+git push origin custom-domain</code></pre></li>
+<li><strong>配置自定义域名</strong>：<ul>
+<li>在仓库 Settings &gt; Pages &gt; Custom domain 中填写你的域名</li>
+<li>添加 DNS 解析记录（CNAME 或 A 记录）</li>
+</ul>
+</li>
+<li><strong>触发部署</strong>：推送代码到 <code>custom-domain</code> 分支，或手动触发工作流</li>
+</ol>
+<hr>
+<h2>注意事项</h2>
+<ul>
+<li>两个工作流<strong>独立运行</strong>，互不影响</li>
+<li><code>main</code> 分支继续部署到 <code>stuffren.github.io/chunking-blog/</code></li>
+<li><code>custom-domain</code> 分支部署到自定义域名（根路径）</li>
+<li>如需同步内容，可将 <code>main</code> 分支的更改合并到 <code>custom-domain</code> 分支</li>
+</ul>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="19"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>

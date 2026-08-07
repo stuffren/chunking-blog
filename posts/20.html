@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自定义域名之7-新增CI工作流的作用及相关问题 | Chunking</title>
+  <meta name="description" content="我有几个疑问：    问题7：在.github/workflows/中新创建的deploy-custom-domain.yml，它的作用是什么？它会和原来的deploy.yml产生冲突吗？   问题8：在本地创建并推送 custom-domain 分支的作用是什么？    问题9：当.github/workflo...">
+  <meta property="og:title" content="自定义域名之7-新增CI工作流的作用及相关问题">
+  <meta property="og:description" content="我有几个疑问：    问题7：在.github/workflows/中新创建的deploy-custom-domain.yml，它的作用是什么？它会和原来的deploy.yml产生冲突吗？   问题8：在本地创建并推送 custom-domain 分支的作用是什么？    问题9：当.github/workflo...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/20">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>自定义域名之7-新增CI工作流的作用及相关问题</span>
+      </nav>
+      <header class="post-header">
+        <h1>自定义域名之7-新增CI工作流的作用及相关问题</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-28T13:59:56Z">2026年7月28日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/github-pages-custom-domain" class="tag">github-pages-custom-domain</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>我有几个疑问：<br>问题7：在.github/workflows/中新创建的deploy-custom-domain.yml，它的作用是什么？它会和原来的deploy.yml产生冲突吗？<br>问题8：在本地创建并推送 custom-domain 分支的作用是什么？<br>问题9：当.github/workflows/中有了这两个分支，那下次我git推送本地项目的改动文件到github仓库时，是不是必须要推送两次?<br>问题10：在注意事项中，你提到”如需同步内容，可将 main 分支的更改合并到 custom-domain 分支“ ，请详细解释一下”如需同步内容“是什么意思？这整句话的含义和应用场景分别是什么？  </p>
+<hr>
+<h2>问题7：<code>deploy-custom-domain.yml</code> 的作用及冲突问题</h2>
+<h3>作用</h3>
+<table>
+<thead>
+<tr>
+<th>工作流文件</th>
+<th>作用</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>deploy.yml</code></td>
+<td>监听 <code>main</code> 分支，构建带 <code>/chunking-blog/</code> 前缀的产物，部署到 GitHub Pages 子路径</td>
+</tr>
+<tr>
+<td><code>deploy-custom-domain.yml</code></td>
+<td>监听 <code>custom-domain</code> 分支，构建带根路径 <code>/</code> 的产物，部署到自定义域名</td>
+</tr>
+</tbody></table>
+<h3>是否会产生冲突？</h3>
+<p><strong>不会冲突</strong>，原因如下：</p>
+<ul>
+<li><p><strong>触发条件不同</strong>：两个工作流监听<strong>不同的分支</strong></p>
+<ul>
+<li><code>deploy.yml</code>：只在 <code>main</code> 分支推送时触发</li>
+<li><code>deploy-custom-domain.yml</code>：只在 <code>custom-domain</code> 分支推送时触发</li>
+</ul>
+</li>
+<li><p><strong>部署目标不同</strong>：</p>
+<ul>
+<li><code>deploy.yml</code> 的产物带有 <code>/chunking-blog/</code> 前缀，适合 <code>stuffren.github.io/chunking-blog/</code></li>
+<li><code>deploy-custom-domain.yml</code> 的产物使用根路径 <code>/</code>，适合 <code>www.yourdomain.com</code></li>
+</ul>
+</li>
+<li><p><strong>运行时机独立</strong>：两个工作流各自在自己的分支推送时运行，不会同时触发</p>
+</li>
+</ul>
+<hr>
+<h2>问题8：创建 <code>custom-domain</code> 分支的作用</h2>
+<h3>核心作用：<strong>隔离不同环境的代码状态</strong></h3>
+<table>
+<thead>
+<tr>
+<th>分支</th>
+<th>用途</th>
+<th>部署结果</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>main</code></td>
+<td>主分支，日常开发</td>
+<td>GitHub Pages 子路径版本</td>
+</tr>
+<tr>
+<td><code>custom-domain</code></td>
+<td>自定义域名专用</td>
+<td>根路径版本</td>
+</tr>
+</tbody></table>
+<h3>为什么要用分支隔离？</h3>
+<p>因为两个环境的构建产物<strong>不同</strong>：</p>
+<ul>
+<li><code>main</code> 分支构建时注入 <code>BASE_PATH=/chunking-blog/</code>，产物中的链接是 <code>/chunking-blog/posts/1</code></li>
+<li><code>custom-domain</code> 分支构建时不注入 <code>BASE_PATH</code>，产物中的链接是 <code>/posts/1</code></li>
+</ul>
+<p>如果共用同一个分支，每次推送都会触发两个工作流，产生冲突。</p>
+<hr>
+<h2>问题9：是否需要推送两次？</h2>
+<p><strong>不需要推送两次文件，但有两个分支需要分别维护。</strong></p>
+<h3>具体说明</h3>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>日常开发</strong></td>
+<td>推送代码到 <code>main</code> 分支（<code>git push origin main</code>）</td>
+</tr>
+<tr>
+<td><strong>更新自定义域名站点</strong></td>
+<td>将 <code>main</code> 的更改合并到 <code>custom-domain</code>，然后推送（<code>git push origin custom-domain</code>）</td>
+</tr>
+</tbody></table>
+<h3>工作流程示例</h3>
+<pre><code class="hljs language-bash"><span class="hljs-comment"># 1. 日常开发，推送到 main 分支</span>
+git checkout main
+<span class="hljs-comment"># ... 修改代码 ...</span>
+git add .
+git commit -m <span class="hljs-string">&quot;更新文章&quot;</span>
+git push origin main          <span class="hljs-comment"># 只触发 deploy.yml</span>
+
+<span class="hljs-comment"># 2. 同步到 custom-domain 分支</span>
+git checkout custom-domain
+git merge main                <span class="hljs-comment"># 将 main 的更改合并过来</span>
+git push origin custom-domain <span class="hljs-comment"># 触发 deploy-custom-domain.yml</span></code></pre><p><strong>关键点</strong>：</p>
+<ul>
+<li>代码修改<strong>只需要在 <code>main</code> 分支做一次</strong></li>
+<li><code>custom-domain</code> 分支通过 <code>git merge</code> 获取更新，不需要重复修改代码</li>
+</ul>
+<hr>
+<h2>问题10：&quot;如需同步内容&quot;的含义和应用场景</h2>
+<h3>含义解释</h3>
+<table>
+<thead>
+<tr>
+<th>术语</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>同步内容</strong></td>
+<td>将 <code>main</code> 分支的最新代码更改，合并到 <code>custom-domain</code> 分支</td>
+</tr>
+<tr>
+<td><strong>目的</strong></td>
+<td>让自定义域名站点和 GitHub Pages 站点显示相同的内容</td>
+</tr>
+</tbody></table>
+<h3>应用场景</h3>
+<p>假设你的博客有以下更新：</p>
+<table>
+<thead>
+<tr>
+<th>时间</th>
+<th>事件</th>
+<th>操作</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>周一</td>
+<td>在 <code>main</code> 分支发布新文章</td>
+<td>推送到 <code>main</code>，GitHub Pages 自动更新</td>
+</tr>
+<tr>
+<td>周三</td>
+<td>想让别人通过自定义域名也能看到这篇新文章</td>
+<td>需要将 <code>main</code> 的更改<strong>同步</strong>到 <code>custom-domain</code></td>
+</tr>
+</tbody></table>
+<h3>同步的具体操作</h3>
+<pre><code class="hljs language-bash"><span class="hljs-comment"># 切换到 custom-domain 分支</span>
+git checkout custom-domain
+
+<span class="hljs-comment"># 将 main 分支的最新更改合并进来</span>
+git merge main
+
+<span class="hljs-comment"># 推送到远程，触发 deploy-custom-domain.yml</span>
+git push origin custom-domain</code></pre><h3>如果不同步会怎样？</h3>
+<table>
+<thead>
+<tr>
+<th>分支</th>
+<th>状态</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>main</code></td>
+<td>有最新文章</td>
+</tr>
+<tr>
+<td><code>custom-domain</code></td>
+<td>停留在旧版本，看不到新文章</td>
+</tr>
+</tbody></table>
+<p><strong>结论</strong>：两个分支是独立的，需要手动同步才能保持内容一致。</p>
+<hr>
+<h2>总结</h2>
+<table>
+<thead>
+<tr>
+<th>问题</th>
+<th>核心答案</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>工作流是否冲突</td>
+<td><strong>不冲突</strong>，监听不同分支</td>
+</tr>
+<tr>
+<td><code>custom-domain</code> 分支作用</td>
+<td><strong>隔离环境</strong>，构建不同产物</td>
+</tr>
+<tr>
+<td>是否需要推送两次</td>
+<td><strong>不需要</strong>，<code>main</code> 开发一次，<code>custom-domain</code> 通过 merge 同步</td>
+</tr>
+<tr>
+<td>&quot;同步内容&quot;含义</td>
+<td>将 <code>main</code> 的更改合并到 <code>custom-domain</code>，保持两个站点内容一致</td>
+</tr>
+</tbody></table>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="20"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>

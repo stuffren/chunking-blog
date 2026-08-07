@@ -231,6 +231,97 @@
       </div>
     </article>
   
+    <article class="post-card">
+      <!-- 修改：内部链接拼上 BASE_PATH -->
+      <h2><a href="/chunking-blog/posts/17">自定义域名之4-环境变量驱动的架构</a></h2>
+      <div class="post-meta">
+        <time datetime="2026-07-28T13:35:58Z">2026年7月28日</time>
+        <span class="category-tag">Blog</span>
+      </div>
+      <p class="post-excerpt">好的，我已经将该文件《将本地开发环境，预览生产环境，GitHub Pages环境的根URL完美隔离的解决方案.md》（以下简称《方案》），复制到了当前项目目录下，请你读取它。   然后，重新回答刚才的问题     问题1：这个方案的最后提到：将来换域名/路径， 只改 CI 环境变量，零代码改动。而你刚才提到如果我决定配置自定义域名，需要修改 vite.config.js 和 build-ss...</p>
+      <div class="post-tags">
+        <span class="tag">github-pages-custom-domain</span>
+      </div>
+    </article>
+  
+    <article class="post-card">
+      <!-- 修改：内部链接拼上 BASE_PATH -->
+      <h2><a href="/chunking-blog/posts/18">自定义域名之5-新增CI工作流 VS 修改现有工作流的环境变量值</a></h2>
+      <div class="post-meta">
+        <time datetime="2026-07-28T13:43:25Z">2026年7月28日</time>
+        <span class="category-tag">Blog</span>
+      </div>
+      <p class="post-excerpt">我来详细对比这两种方式的区别，并给出建议。   问题6：两种方式的区别   方式A：新增一个 CI 工作流  做法：创建一个新的 GitHub Actions 工作流文件（如 deploy-custom-domain.yml），专门用于部署到自定义域名。  | 维度 | 说明 | |------|------| | BASE_PATH 设置 | 不注入 BASE_PATH，使用...</p>
+      <div class="post-tags">
+        <span class="tag">github-pages-custom-domain</span>
+      </div>
+    </article>
+  
+    <article class="post-card">
+      <!-- 修改：内部链接拼上 BASE_PATH -->
+      <h2><a href="/chunking-blog/posts/19">自定义域名之6-采用`新增 CI 工作流 deploy-custom-domain.yml`方式</a></h2>
+      <div class="post-meta">
+        <time datetime="2026-07-28T13:49:47Z">2026年7月28日</time>
+        <span class="category-tag">Blog</span>
+      </div>
+      <p class="post-excerpt">好的，我决定采用方式A，请基于当前项目.github\workflows中的deploy.yml，新增一个CI 工作流 deploy-custom-domain.yml。   要求：   1.该工作流不设置 BASE_PATH（或显式设置为 /）   2.构建产物将使用根路径，适合自定义域名部署    ---  我已经查看了现有的 deploy.yml 文件。现在为你创建新的 dep...</p>
+      <div class="post-tags">
+        <span class="tag">github-pages-custom-domain</span>
+      </div>
+    </article>
+  
+    <article class="post-card">
+      <!-- 修改：内部链接拼上 BASE_PATH -->
+      <h2><a href="/chunking-blog/posts/20">自定义域名之7-新增CI工作流的作用及相关问题</a></h2>
+      <div class="post-meta">
+        <time datetime="2026-07-28T13:59:56Z">2026年7月28日</time>
+        <span class="category-tag">Blog</span>
+      </div>
+      <p class="post-excerpt">我有几个疑问：    问题7：在.github/workflows/中新创建的deploy-custom-domain.yml，它的作用是什么？它会和原来的deploy.yml产生冲突吗？   问题8：在本地创建并推送 custom-domain 分支的作用是什么？    问题9：当.github/workflows/中有了这两个分支，那下次我git推送本地项目的改动文件到github仓库时...</p>
+      <div class="post-tags">
+        <span class="tag">github-pages-custom-domain</span>
+      </div>
+    </article>
+  
+    <article class="post-card">
+      <!-- 修改：内部链接拼上 BASE_PATH -->
+      <h2><a href="/chunking-blog/posts/21">自定义域名之8-costom domain的详细操作步骤</a></h2>
+      <div class="post-meta">
+        <time datetime="2026-07-28T14:07:47Z">2026年7月28日</time>
+        <span class="category-tag">Blog</span>
+      </div>
+      <p class="post-excerpt">问题11：在我的本项目的《操作说明文档》中，它的具体操作建议如下：  第十三步：自定义域名（可选）  （13.1）配置 DNS 1. 在你的域名服务商添加 CNAME 记录：    - 主机记录：blog 或 @    - 记录值：你的用户名.github.io  （13.2）仓库配置 1. 仓库 Settings → Pages 2. Custom domain 填写你的域名...</p>
+      <div class="post-tags">
+        <span class="tag">github-pages-custom-domain</span>
+      </div>
+    </article>
+  
+    <article class="post-card">
+      <!-- 修改：内部链接拼上 BASE_PATH -->
+      <h2><a href="/chunking-blog/posts/22">自定义域名之9-验证github官网IP地址的几种方法</a></h2>
+      <div class="post-meta">
+        <time datetime="2026-07-28T14:13:03Z">2026年7月28日</time>
+        <span class="category-tag">Blog</span>
+      </div>
+      <p class="post-excerpt">问题12：有哪些方法可以确认你刚才提供的4 个 A 记录指向 GitHub Pages 的 IP 地址，是github官网的IP地址?       &lt;br&gt;  ---  我来帮你搜索 GitHub 官方文档，确认这些 IP 地址。  我已经通过搜索确认了这些 IP 地址。以下是你可以用来验证的几种方法：    方法一：查看 GitHub 官方文档（最权威）  GitHu...</p>
+      <div class="post-tags">
+        <span class="tag">github-pages-custom-domain</span>
+      </div>
+    </article>
+  
+    <article class="post-card">
+      <!-- 修改：内部链接拼上 BASE_PATH -->
+      <h2><a href="/chunking-blog/posts/23">自定义域名之10-github pages成为重定向入口后是否有必要保持4种环境的BASE_PATH的隔离思路？</a></h2>
+      <div class="post-meta">
+        <time datetime="2026-07-28T14:24:15Z">2026年7月28日</time>
+        <span class="category-tag">Blog</span>
+      </div>
+      <p class="post-excerpt">问题13：之前保持了《将本地开发环境，预览生产环境，GitHub Pages环境的根URL完美隔离的解决方案.md》和之后新增的 CI 工作流 deploy-custom-domain.yml。我当前在项目仓库的github pages里面配置了自定义域名envjs.fun，  现在可以成功通过自定义域名https://envjs.fun/访问博客。同时我发现当我访问原来的github pages...</p>
+      <div class="post-tags">
+        <span class="tag">github-pages-custom-domain</span>
+      </div>
+    </article>
+  
       </div>
     </div>
   

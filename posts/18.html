@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>自定义域名之5-新增CI工作流 VS 修改现有工作流的环境变量值 | Chunking</title>
+  <meta name="description" content="我来详细对比这两种方式的区别，并给出建议。   问题6：两种方式的区别   方式A：新增一个 CI 工作流  做法：创建一个新的 GitHub Actions 工作流文件（如 deploy-custom-domain.yml），专门用于部署到自定义域名。  | 维度 | 说明 | |------|--...">
+  <meta property="og:title" content="自定义域名之5-新增CI工作流 VS 修改现有工作流的环境变量值">
+  <meta property="og:description" content="我来详细对比这两种方式的区别，并给出建议。   问题6：两种方式的区别   方式A：新增一个 CI 工作流  做法：创建一个新的 GitHub Actions 工作流文件（如 deploy-custom-domain.yml），专门用于部署到自定义域名。  | 维度 | 说明 | |------|--...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/18">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-Dix6Oozi.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>自定义域名之5-新增CI工作流 VS 修改现有工作流的环境变量值</span>
+      </nav>
+      <header class="post-header">
+        <h1>自定义域名之5-新增CI工作流 VS 修改现有工作流的环境变量值</h1>
+        <div class="post-meta">
+          <time datetime="2026-07-28T13:43:25Z">2026年7月28日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/github-pages-custom-domain" class="tag">github-pages-custom-domain</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <p>我来详细对比这两种方式的区别，并给出建议。</p>
+<h2>问题6：两种方式的区别</h2>
+<h3>方式A：新增一个 CI 工作流</h3>
+<p><strong>做法</strong>：创建一个新的 GitHub Actions 工作流文件（如 <code>deploy-custom-domain.yml</code>），专门用于部署到自定义域名。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>BASE_PATH 设置</strong></td>
+<td>不注入 <code>BASE_PATH</code>，使用默认值 <code>/</code></td>
+</tr>
+<tr>
+<td><strong>触发条件</strong></td>
+<td>可以独立配置（如推送到 <code>custom-domain</code> 分支、手动触发、或定时触发）</td>
+</tr>
+<tr>
+<td><strong>部署目标</strong></td>
+<td>可以部署到不同的平台（如 Vercel、Netlify、自己的服务器）或同一个仓库的不同环境</td>
+</tr>
+<tr>
+<td><strong>代码改动</strong></td>
+<td>新增 1 个工作流文件，现有工作流完全不动</td>
+</tr>
+<tr>
+<td><strong>并行能力</strong></td>
+<td>GitHub Pages 和自定义域名可以<strong>同时存在、同时更新</strong></td>
+</tr>
+<tr>
+<td><strong>回滚能力</strong></td>
+<td>如果自定义域名出问题，GitHub Pages 工作流不受影响，随时可回退</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>方式B：修改现有工作流的环境变量值</h3>
+<p><strong>做法</strong>：修改现有的 <code>deploy.yml</code>，将 <code>BASE_PATH</code> 的值从 <code>/chunking-blog/</code> 改为 <code>/</code> 或删除。</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>BASE_PATH 设置</strong></td>
+<td>改为 <code>/</code> 或直接删除该环境变量</td>
+</tr>
+<tr>
+<td><strong>触发条件</strong></td>
+<td>保持原有触发逻辑（如推送到 <code>main</code> 分支自动部署）</td>
+</tr>
+<tr>
+<td><strong>部署目标</strong></td>
+<td>只能部署到同一个目标（GitHub Pages）</td>
+</tr>
+<tr>
+<td><strong>代码改动</strong></td>
+<td>修改现有工作流文件中的 1-2 行配置</td>
+</tr>
+<tr>
+<td><strong>并行能力</strong></td>
+<td><strong>无法并行</strong>。每次推送只能生成一种 base path 的产物</td>
+</tr>
+<tr>
+<td><strong>回滚能力</strong></td>
+<td>需要再次修改工作流并重新部署，才能切回 GitHub Pages 配置</td>
+</tr>
+</tbody></table>
+<hr>
+<h3>核心区别对比表</h3>
+<table>
+<thead>
+<tr>
+<th>对比项</th>
+<th>方式A：新增工作流</th>
+<th>方式B：修改现有工作流</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>GitHub Pages 保留</strong></td>
+<td>✅ 保留，可同时运行</td>
+<td>❌ 被覆盖或需要手动切换</td>
+</tr>
+<tr>
+<td><strong>自定义域名并行</strong></td>
+<td>✅ 完全并行</td>
+<td>❌ 互斥，只能二选一</td>
+</tr>
+<tr>
+<td><strong>代码改动量</strong></td>
+<td>新增 1 个文件（约 30-50 行）</td>
+<td>修改 1-2 行</td>
+</tr>
+<tr>
+<td><strong>回滚难度</strong></td>
+<td>极低，两个工作流独立</td>
+<td>需要再次修改配置并部署</td>
+</tr>
+<tr>
+<td><strong>部署灵活性</strong></td>
+<td>高，可部署到不同平台</td>
+<td>低，只能到 GitHub Pages</td>
+</tr>
+<tr>
+<td><strong>维护复杂度</strong></td>
+<td>稍高，需要维护两个工作流</td>
+<td>低，只有一个工作流</td>
+</tr>
+<tr>
+<td><strong>适用场景</strong></td>
+<td>长期维护两个访问入口</td>
+<td>彻底迁移到自定义域名</td>
+</tr>
+</tbody></table>
+<hr>
+<h2>问题7：哪种方式更好？</h2>
+<h3>推荐：<strong>方式A（新增工作流）</strong></h3>
+<p>理由如下：</p>
+<table>
+<thead>
+<tr>
+<th>评估维度</th>
+<th>方式A</th>
+<th>方式B</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>易用性</strong></td>
+<td>⭐⭐⭐ 推送即部署，无需关心环境变量</td>
+<td>⭐⭐ 需要记住当前工作流配置的是哪个环境</td>
+</tr>
+<tr>
+<td><strong>稳定性</strong></td>
+<td>⭐⭐⭐ 两个环境独立，互不影响</td>
+<td>⭐⭐ 切换时需要小心，容易误操作</td>
+</tr>
+<tr>
+<td><strong>最少代码改动</strong></td>
+<td>⭐⭐ 新增文件，现有代码零改动</td>
+<td>⭐⭐⭐ 只改 1-2 行</td>
+</tr>
+<tr>
+<td><strong>长期可维护性</strong></td>
+<td>⭐⭐⭐ 清晰、可扩展</td>
+<td>⭐⭐ 配置容易混乱</td>
+</tr>
+<tr>
+<td><strong>风险可控性</strong></td>
+<td>⭐⭐⭐ 随时可回滚到 GitHub Pages</td>
+<td>⭐⭐ 回滚需要再次修改并等待部署</td>
+</tr>
+</tbody></table>
+<h3>关键考量</h3>
+<p><strong>方式A 的核心优势：保留 GitHub Pages 作为兜底方案</strong></p>
+<ul>
+<li><p>自定义域名可能出现的问题：</p>
+<ul>
+<li>DNS 解析故障</li>
+<li>域名到期未续费</li>
+<li>SSL 证书问题</li>
+<li>备案问题（国内域名）</li>
+</ul>
+</li>
+<li><p>有了方式A，即使自定义域名出问题，用户依然可以通过 <code>https://stuffren.github.io/chunking-blog/</code> 访问你的博客。</p>
+</li>
+</ul>
+<p><strong>方式B 的风险：</strong></p>
+<ul>
+<li>一旦修改工作流，GitHub Pages 的产物就变成了根路径版本</li>
+<li>如果 <code>stuffren.github.io/chunking-blog/</code> 这个地址还有用户 bookmark 或外链，访问会 404</li>
+<li>想恢复 GitHub Pages 版本，必须再次修改工作流并重新部署</li>
+</ul>
+<hr>
+<h2>最终建议</h2>
+<table>
+<thead>
+<tr>
+<th>场景</th>
+<th>推荐方式</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><strong>计划长期同时使用</strong> GitHub Pages + 自定义域名</td>
+<td><strong>方式A：新增工作流</strong></td>
+</tr>
+<tr>
+<td><strong>彻底弃用</strong> GitHub Pages，完全迁移到自定义域名</td>
+<td>方式B：修改现有工作流</td>
+</tr>
+<tr>
+<td><strong>想先试用</strong>自定义域名，保留回退能力</td>
+<td><strong>方式A：新增工作流</strong></td>
+</tr>
+<tr>
+<td><strong>追求极简配置</strong>，不想维护多个工作流</td>
+<td>方式B：修改现有工作流</td>
+</tr>
+</tbody></table>
+<p><strong>我的建议</strong>：选择 <strong>方式A（新增工作流）</strong>。</p>
+<p>虽然多一个文件，但换来了：</p>
+<ul>
+<li>✅ 两个环境并行运行</li>
+<li>✅ 零风险回滚</li>
+<li>✅ 未来扩展更灵活（如再添加其他部署目标）</li>
+</ul>
+<p>这符合《方案》的设计哲学：<strong>环境隔离、零代码改动、风险可控</strong>。</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="18"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-DV_zuSHL.js"></script>
+</body>
+</html>
