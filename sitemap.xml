@@ -131,6 +131,11 @@
     <changefreq>weekly</changefreq>
   </url>
   <url>
+    <loc>https://envjs.fun/posts/24</loc>
+    <priority>0.9</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
     <loc>https://envjs.fun/categories/blog</loc>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
@@ -162,6 +167,11 @@
   </url>
   <url>
     <loc>https://envjs.fun/tags/enhancement</loc>
+    <priority>0.7</priority>
+    <changefreq>weekly</changefreq>
+  </url>
+  <url>
+    <loc>https://envjs.fun/tags/git</loc>
     <priority>0.7</priority>
     <changefreq>weekly</changefreq>
   </url>
