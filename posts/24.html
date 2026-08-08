@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>如何只把当前A分支中的几个修改过的文件同步到B分支中 | Chunking</title>
+  <meta name="description" content="如何只把当前A分支中的几个修改过的文件同步到B分支中  - 应用场景：A分支中的N个文件已经修改了，且进行了git提交和推送。希望只将A分支中这几个刚才修改过的文件同步到B分支中。  bash 0. 确认当前分支  git branch  custom-domain   1. 把所有修改文件加入暂存区...">
+  <meta property="og:title" content="如何只把当前A分支中的几个修改过的文件同步到B分支中">
+  <meta property="og:description" content="如何只把当前A分支中的几个修改过的文件同步到B分支中  - 应用场景：A分支中的N个文件已经修改了，且进行了git提交和推送。希望只将A分支中这几个刚才修改过的文件同步到B分支中。  bash 0. 确认当前分支  git branch  custom-domain   1. 把所有修改文件加入暂存区...">
+  <meta property="og:type" content="article">
+  <meta property="og:url" content="https://stuffren.github.io/chunking-blog/posts/24">
+  <meta property="og:image" content="https://stuffren.github.io/chunking-blog/og-default.png">
+  <meta name="twitter:card" content="summary_large_image">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github.min.css">
+  <!-- 修改：移除开发环境路径的独立样式引用,改用 Vite 构建后的 CSS assets -->
+  <link rel="stylesheet" crossorigin href="/chunking-blog/assets/main-ByNavODM.css">
+</head>
+<body>
+  <div id="app">
+    <header class="site-header">
+      <div class="container">
+        <nav class="main-nav">
+          <!-- 修改：所有内部导航链接自动拼上 BASE_PATH，适配 GitHub Pages 子路径部署 -->
+          <a href="/chunking-blog/" class="logo">chunking</a>
+          <div class="nav-links">
+            <a href="/chunking-blog/categories">Categories</a>
+            <a href="/chunking-blog/tags">Tags</a>
+            <a href="/chunking-blog/about">About</a>
+          </div>
+        </nav>
+      </div>
+    </header>
+    <main class="site-main">
+      
+    <article class="page-post container">
+      <nav class="breadcrumb" aria-label="breadcrumb">
+        <!-- 修改：内部链接拼上 BASE_PATH -->
+        <a href="/chunking-blog/">Home</a>
+        <span class="sep">/</span>
+        <span>如何只把当前A分支中的几个修改过的文件同步到B分支中</span>
+      </nav>
+      <header class="post-header">
+        <h1>如何只把当前A分支中的几个修改过的文件同步到B分支中</h1>
+        <div class="post-meta">
+          <time datetime="2026-08-08T05:14:05Z">2026年8月8日</time>
+          <!-- 修改：内部链接拼上 BASE_PATH -->
+          <a href="/chunking-blog/categories/blog" class="category-link">Blog</a>
+          <a href="/chunking-blog/tags/git" class="tag">git</a>
+        </div>
+      </header>
+      <div class="post-content">
+        <h2>如何只把当前A分支中的几个修改过的文件同步到B分支中</h2>
+<ul>
+<li>应用场景：A分支中的N个文件已经修改了，且进行了git提交和推送。希望只将A分支中这几个刚才修改过的文件同步到B分支中。</li>
+</ul>
+<pre><code class="hljs language-bash"><span class="hljs-comment">#0. 确认当前分支 </span>
+git branch 
+custom-domain 
+
+<span class="hljs-comment">#1. 把所有修改文件加入暂存区 </span>
+git add . 
+
+<span class="hljs-comment">#2. 提交修改记录 </span>
+git commit -m <span class="hljs-string">&quot;博客文章正文内容不够紧凑的问题 
+
+- 修改点 1：variables.css中的部分字号和行高 
+- 修改点 2：pages.css中的段落和标题间距 
+- 修改点 3：layout.css中的.main-nav和.breadcrumb同时增加了上边距，调整了面包屑和页脚的字号 
+- 修改点 3：components.css中的分类卡片的字号&quot;</span> 
+
+<span class="hljs-comment">#3.推送到远程仓库 </span>
+git push origin custom-domain   </code></pre><p>刚才在custom-domain分支中，我把CSS相关的修改成功提交并推送到了custom-domain远程仓库。    </p>
+<p>接下来我想把这些修改同步到我的main分支中，然后进行远程推送。    </p>
+<p>现在的问题是：如何只把custom-domain分支中这几个刚才修改过的文件同步到main分支中，同时不会造成和main分支中其他文件的冲突？  </p>
+<hr>
+<p>这里我询问了Qwen3.6-plus，它推荐使用 cherry-pick 方式。</p>
+<h2>方法一：使用 <code>git cherry-pick</code>（推荐）</h2>
+<p>这个方法会把 <code>custom-domain</code> 分支上的<strong>最后一次提交</strong>完整地应用到 <code>main</code> 分支上。</p>
+<pre><code class="hljs language-bash"><span class="hljs-comment"># 1. 切换到 main 分支</span>
+git checkout main
+
+<span class="hljs-comment"># 2. 拉取 main 分支最新代码</span>
+git pull origin main
+
+<span class="hljs-comment"># 3. cherry-pick custom-domain 分支的最新一次提交</span>
+git cherry-pick custom-domain
+
+<span class="hljs-comment"># 4. 推送到远程 main 分支</span>
+git push origin main</code></pre><p><strong>优点：</strong> 操作简单，完整保留提交信息，不会动到其他文件。</p>
+<hr>
+<h2>如何避免冲突？</h2>
+<p>无论用哪种方法，<strong>关键步骤是先 <code>git pull origin main</code></strong>，确保你的本地 <code>main</code> 是最新的。只要 main 分支上没有人修改过这 4 个 CSS 文件，就不会产生冲突。</p>
+<p><strong>我推荐用方法一（cherry-pick）</strong>，因为它保留了完整的提交记录，方便后续追溯。</p>
+<hr>
+<p>最终，我采用了方法一：使用 <code>git cherry-pick</code>，在本地powershell中和远程的构建部署中都没有任何报错！</p>
+
+      </div>
+      <div class="giscus" 
+        data-repo="stuffren/chunking-blog"
+        data-repo-id="R_kgDOTgBK3w"
+        data-category="Comments"
+        data-category-id="DIC_kwDOTgBK384DBuHZ"
+        data-mapping="specific"
+        data-term="24"
+        data-reactions-enabled="1"
+        data-emit-metadata="0"
+        data-input-position="bottom"
+        data-theme="preferred_color_scheme"
+        data-lang="zh-CN">
+      </div>
+    </article>
+  
+    </main>
+    <footer class="site-footer">
+      <div class="container">
+        <p>© 2026 Vanilla JS Development - All rights reserved.</p>
+      </div>
+    </footer>
+  </div>
+  <!-- 修改：移除开发环境路径的 /src/main.js,改用 Vite 构建后的 JS assets -->
+  <script type="module" crossorigin src="/chunking-blog/assets/main-1VHsRzp8.js"></script>
+</body>
+</html>
